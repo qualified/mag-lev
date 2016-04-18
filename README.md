@@ -1,15 +1,28 @@
-# Maglev
+# MagLev
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/maglev`. To experiment with that code, run `bin/console` for an interactive prompt.
+Lift your Rails app with additional conventions that will turbo charge your development. These include: 
 
-TODO: Delete this and the text above, and describe your gem
+- **Listeners**: Leverage listeners to cleanly manage cross-cutting concerns. 
+- **Service Objects**: Leverage service objects to wrap complicated functionality and easily execute that logic within a backend queue.
+- **Serializers**: JBuilder is slow, use our serializers to write clean and maintainable JSON serialization logic.
+- **Current User**: Manage which user is currently acting on the data
+- **Sidekiq Extensions**: Sidekiq is integrated into all conventions with a number of productivity improvements, including:
+    - Ability to track the current user across backend tasks
+    - Unique jobs to prevent redundant tasks from being ran
+    - Listener integration
+    - Timeouts
+    - Reliability feature (currently requires MongoDB)
+    - Better error handling
+    - Improved serialization for automatically serializing objects via GlobalID, Yaml and special handling for destroyed models
+- **Statsd Integration**: The framework is preconfigured and ready to start logging essential data with Statsd
+- **Utilities**: Features such as UnitOfWork, Guard, Lock and error reporting.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'maglev'
+gem 'mag-lev'
 ```
 
 And then execute:
@@ -18,7 +31,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install maglev
+    $ gem install mag-lev
 
 ## Usage
 
