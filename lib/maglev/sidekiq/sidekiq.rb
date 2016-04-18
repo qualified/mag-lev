@@ -13,8 +13,10 @@ require 'maglev/sidekiq/current_user/server'
 require 'maglev/sidekiq/serialization/client'
 require 'maglev/sidekiq/serialization/server'
 
-require 'maglev/sidekiq/reliable/server'
-require 'maglev/sidekiq/reliable/document'
+if defined?(Mongoid)
+  require 'maglev/sidekiq/reliable/server'
+  require 'maglev/sidekiq/reliable/document'
+end
 
 require 'maglev/sidekiq/statsd/server'
 require 'maglev/sidekiq/statsd/client'
@@ -24,7 +26,6 @@ require 'maglev/sidekiq/slow_reporter/server'
 require 'maglev/sidekiq/errors/server'
 require 'maglev/sidekiq/timeout/server'
 require 'maglev/sidekiq/store/server'
-require 'maglev/sidekiq/process_limits/server'
 
 module MagLev
   module Sidekiq

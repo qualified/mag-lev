@@ -1,3 +1,4 @@
+require 'sidekiq'
 module MagLev
   class ServiceObjectWorker
     include ::Sidekiq::Worker
