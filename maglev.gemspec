@@ -4,8 +4,8 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'maglev/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "maglev"
-  spec.version       = Maglev::VERSION
+  spec.name          = "mag-lev"
+  spec.version       = MagLev::VERSION
   spec.authors       = ["jhoffner"]
   spec.email         = ["jake.hoffner@gmail.com"]
 

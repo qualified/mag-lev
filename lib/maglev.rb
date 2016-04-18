@@ -18,6 +18,7 @@ require 'maglev/listeners/broadcaster'
 require 'maglev/listeners/broadcastable'
 require 'maglev/listeners/event'
 require 'maglev/sidekiq/sidekiq'
+require 'maglev/railtie' if defined?(Rails)
 
 module MagLev
   def self.config
@@ -61,6 +62,16 @@ module MagLev
     elsif test? then 'test'
     else 'web'
     end
+  end
+
+  # finds the environment value that is not blank
+  def self.env(*keys)
+    keys.map{|key| ENV[key]}.find {|v| !v.blank?}
+  end
+
+  def self.env_int(*keys)
+    v = self.env(*keys)
+    v ? v.to_i : v
   end
 end
 
