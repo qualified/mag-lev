@@ -1,10 +1,10 @@
 # MagLev
 
-Lift your Rails app with additional conventions that will turbo charge your development. These include: 
+Lift your Rails app with additional conventions and utilities that will turbo charge your development. These include: 
 
 - **Listeners**: Leverage listeners to cleanly manage cross-cutting concerns. 
 - **Service Objects**: Leverage service objects to wrap complicated functionality and easily execute that logic within a backend queue.
-- **Serializers**: JBuilder is slow, use our serializers to write clean and maintainable JSON serialization logic.
+- **Serializers**: JBuilder is slow, use our serializers instead to write clean and maintainable JSON serialization logic.
 - **Current User**: Manage which user is currently acting on the data
 - **Sidekiq Extensions**: Sidekiq is integrated into all conventions with a number of productivity improvements, including:
     - Ability to track the current user across backend tasks
@@ -15,7 +15,7 @@ Lift your Rails app with additional conventions that will turbo charge your deve
     - Better error handling
     - Improved serialization for automatically serializing objects via GlobalID, Yaml and special handling for destroyed models
 - **Statsd Integration**: The framework is preconfigured and ready to start logging essential data with Statsd
-- **Utilities**: Features such as UnitOfWork, Guard, Lock and error reporting.
+- **Utilities**: Features such as UnitOfWork, Try, Guard, Lock, Memo and error reporting.
 
 ## Installation
 

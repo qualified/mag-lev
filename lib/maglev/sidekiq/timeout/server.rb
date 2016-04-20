@@ -9,8 +9,14 @@ module MagLev
       class Server
         def call(worker_class, msg, queue)
           if msg['timeout']
-            ::Timeout.timeout([msg['timeout'].to_i, 30].max) do
-              yield
+            begin
+              ::Timeout.timeout([msg['timeout'].to_i, 30].max) do
+                yield
+              end
+            rescue ::Timeout::Error
+              MagLev::Statsd.increment("sidekiq.timeouts.count")
+              MagLev::Statsd.increment("sidekiq.timeouts.#{worker_class}.count")
+              raise
             end
           else
             yield

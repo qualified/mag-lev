@@ -1,3 +1,5 @@
+require 'concurrent'
+
 module MagLev
   module Statsd
     @mutex = Mutex.new

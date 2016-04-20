@@ -53,13 +53,17 @@ end
 
   protected
 
+  def service_object_worker_class_name
+    defined?(ApplicationServiceObjectWorker) ? 'ApplicationServiceObjectWorker' : 'MagLev::ServiceObjectWorker'
+  end
+
   def context_base_class_name
     @view_model_base_class_name ||= begin
       name = "#{model_class_name}::ServiceObject"
       begin
         name.to_const
       rescue
-        'ServiceObject'
+        defined?(ApplicationServiceObject) ? 'ApplicationServiceObject' : 'MagLev::ServiceObject'
       end
     end
   end

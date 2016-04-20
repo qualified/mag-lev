@@ -6,10 +6,16 @@ require 'maglev/config'
 require 'maglev/current_user'
 require 'maglev/logger'
 require 'maglev/try'
-require 'maglev/statsd'
 require 'maglev/class_logger'
 require 'maglev/event_reporter'
 require 'maglev/lock'
+require 'maglev/memo'
+require 'maglev/memory_stores'
+require 'maglev/statsd'
+require 'maglev/facets/hash'
+require 'maglev/facets/object'
+require 'maglev/facets/parameters'
+require 'maglev/facets/string'
 require 'maglev/serialization/serializer'
 require 'maglev/serialization/model_response_serializer'
 require 'maglev/serialization/hash_serializer'
@@ -24,57 +30,77 @@ require 'maglev/sidekiq/sidekiq'
 require 'maglev/railtie' if defined?(Rails)
 
 module MagLev
-  def self.config
-    @config ||= MagLev::Config.new
-  end
 
-  def self.configure
-    yield(config) if block_given?
-    config.send(:apply)
-  end
+  class << self
+    include MagLev::Memo
 
-  def self.request_store
-    RequestStore.store[:maglev] ||= {}
-  end
-
-  # true if running within web process. Considered to be true if not running in a rake/sidekiq/console process
-  def self.web?
-    !console? && !rake? && !sidekiq?
-  end
-
-  def self.sidekiq?
-    !!::Sidekiq.server?
-  end
-
-  def self.rake?
-    File.split($0).last.include? 'rake'
-  end
-
-  def self.console?
-    !!defined?(Rails::Console)
-  end
-
-  def self.test?
-    (defined?(Rails.env) && Rails.env.test?) || !!defined?(RSpec)
-  end
-
-  def self.process_type
-    if console? then 'console'
-    elsif rake? then 'rake'
-    elsif sidekiq? then 'sidekiq'
-    elsif test? then 'test'
-    else 'web'
+    def config
+      @config ||= MagLev::Config.new
     end
-  end
 
-  # finds the environment value that is not blank
-  def self.env(*keys)
-    keys.map{|key| ENV[key]}.find {|v| !v.blank?}
-  end
+    def configure
+      yield(config) if block_given?
+      config.send(:apply)
+    end
 
-  def self.env_int(*keys)
-    v = self.env(*keys)
-    v ? v.to_i : v
+    def request_store
+      RequestStore.store[:maglev] ||= {}
+    end
+
+    # true if running within web process. Considered to be true if not running in a rake/sidekiq/console process
+    def web?
+      !console? && !rake? && !sidekiq?
+    end
+
+    def sidekiq?
+      !!::Sidekiq.server?
+    end
+
+    def rake?
+      File.split($0).last.include? 'rake'
+    end
+
+    def console?
+      !!defined?(Rails::Console)
+    end
+
+    def test?
+      (defined?(Rails.env) && Rails.env.test?) || !!defined?(RSpec)
+    end
+
+    def process_type
+      if console? then 'console'
+      elsif rake? then 'rake'
+      elsif sidekiq? then 'sidekiq'
+      elsif test? then 'test'
+      else 'web'
+      end
+    end
+
+    # finds the environment value that is not blank
+    def env(*keys)
+      keys.map{|key| ENV[key]}.find {|v| !v.blank?}
+    end
+
+    def env_int(*keys)
+      v = self.env(*keys)
+      v ? v.to_i : v
+    end
+
+    # useful when working within dev environments and configuring fallback urls.
+    def docker_or_local(port)
+      "#{docker_ip.present? ? docker_ip : 'localhost'}:#{port}"
+    end
+
+    # Utility for finding the IP of the docker-machine instance on the machine.
+    memo def docker_ip(machine_name = 'default')
+      @docker_ip ||= if ENV['DOCKER_HOSTS']
+        ENV['DOCKER_HOST'].gsub(/tcp:\/\/|:\d*/, '')
+      else
+        ip = `docker-machine ip #{machine_name}`
+        ip ? ip.gsub("\n", '') : nil
+      end
+    end
   end
 end
 

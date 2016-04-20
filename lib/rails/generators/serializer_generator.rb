@@ -1,7 +1,7 @@
 class ListenerGenerator < MagLev::BaseGenerator
   def create_context_file
     create_file "app/serializers/#{class_name.underscore}_serializer.rb", <<-FILE
-class #{class_name}Serializer < MagLev::Serialization::Serializer
+class #{class_name}Serializer < MagLev::Serializer
 
 end
     FILE
@@ -20,5 +20,9 @@ describe #{class_name}Serializer do
   pending
 end
     FILE
+  end
+
+  def base_serializer_class_name
+    defined?(ApplicationSerializer) ? ApplicationSerializer : MagLev::Serializer
   end
 end

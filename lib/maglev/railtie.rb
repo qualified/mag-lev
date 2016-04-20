@@ -1,11 +1,11 @@
 module MagLev
   class Railtie < Rails::Railtie
     config.before_configuration do |app|
-      app.config.autoload_paths << "#{Rails.root}/app/service_objects"
-      app.config.autoload_paths << "#{Rails.root}/app/workers"
-      app.config.autoload_paths << "#{Rails.root}/app/service_objects/concerns"
-      app.config.autoload_paths << "#{Rails.root}/app/listeners"
-      app.config.autoload_paths << "#{Rails.root}/app/serializers"
+      app.config.paths.add "app/service_objects/concerns", eager_load: true
+      app.config.paths.add "app/service_objects", eager_load: true
+      app.config.paths.add "app/workers", eager_load: true
+      app.config.paths.add "app/listeners", eager_load: true
+      app.config.paths.add "app/serializers", eager_load: true
     end
 
     generators do

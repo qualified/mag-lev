@@ -126,6 +126,7 @@ module MagLev
             async_method = "#{event.name}_async"
             if listener.respond_to?(async_method, true)
               MagLev::Sidekiq::Listeners::Worker.perform_async(listener.class.name, async_method, *event.args)
+              MagLev.logger.info "#{listener.class.name}.#{async_method} queued for background execution"
               event.listened << listener.class.name unless listened
               listened = true
             end
