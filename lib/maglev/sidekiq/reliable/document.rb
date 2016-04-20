@@ -7,6 +7,8 @@ module MagLev
           field :msg
           field :created_at, type: Time, default: -> { Time.now }
 
+          scope :stale, -> { where(:created_at.lt => 30.minutes.ago) }
+
           # requeues the job and then deletes this document
           def requeue!
             ::Sidekiq.redis do |conn|
