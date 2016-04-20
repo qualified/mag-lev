@@ -15,14 +15,20 @@ module MagLev
     end
 
     def sidekiq
-      @sidekiq ||= Sidekiq.new.tap do |sidekiq|
-        yield sidekiq if block_given?
+      @sidekiq ||= Sidekiq.new.tap do |config|
+        yield config if block_given?
+      end
+    end
+
+    def active_job
+      @active_job ||= ActiveJob.new.tap do |config|
+        yield config if block_given?
       end
     end
 
     def listeners
-      @listeners ||= Listeners.new.tap do |listeners|
-        yield listeners if block_given?
+      @listeners ||= Listeners.new.tap do |config|
+        yield config if block_given?
       end
     end
 
@@ -80,7 +86,6 @@ module MagLev
         @global_id_enabled = true
         @yaml_enabled = true
         @global_id_locator = nil
-        @process_limits = {}
         @heartbeat_interval = 5
         @max_heartbeat_interval = 30
       end
@@ -127,7 +132,7 @@ module MagLev
 
       def config_global_id
         if global_id_locator
-          GlobalID::Locator.use :sidekiq do |gid|
+          GlobalID::Locator.use :maglev do |gid|
             begin
               global_id_locator.new(gid).locate
             rescue => ex
@@ -149,6 +154,61 @@ module MagLev
         chain.add MagLev::Sidekiq::Serialization::Server if serialize?
         chain.add MagLev::Sidekiq::Timeout::Server
         chain.add MagLev::Sidekiq::SlowReporter::Server
+      end
+    end
+
+    class ActiveJob
+      # change to false to disable activejob integration
+      attr_accessor :enabled
+
+      attr_accessor :unique_jobs_enabled
+
+      # determines if additional serialization should be performed to handle more complex types
+      # than sidekiq normally allows. Default is true
+      attr_accessor :yaml_enabled
+
+      # set if global_id should be enabled for active job. By doing so, ORM records will be
+      # serialized based off of their ID and then a fresh copy will be retrived once the job
+      # executes. Default is true
+      attr_accessor :global_id_enabled
+
+      # set to a proc if you wish hook into to any error that is thrown while trying to locate a global id
+      attr_accessor :global_id_error_handler
+
+      attr_accessor :global_id_locator
+
+      def initialize
+        @enabled = true
+        @unique_jobs_enabled = true
+        @global_id_enabled = true
+        @yaml_enabled = true
+        @global_id_locator = nil
+      end
+
+      # true if the any of the serialization features are enabled
+      def serialize?
+        yaml_enabled || global_id_enabled
+      end
+
+      protected
+
+      def apply
+        if enabled && !@applied
+          @applied = true
+        end
+      end
+
+      def config_global_id
+        if global_id_locator
+          GlobalID::Locator.use :maglev do |gid|
+            begin
+              global_id_locator.new(gid).locate
+            rescue => ex
+              global_id_error_handler.call(gid, ex) if global_id_error_handler
+              raise
+            end
+          end
+        end
       end
     end
 

@@ -1,4 +1,6 @@
 require 'request_store'
+require 'active_support'
+
 require 'maglev/version'
 require 'maglev/errors'
 require 'maglev/guard'
@@ -27,6 +29,7 @@ require 'maglev/listeners/broadcaster'
 require 'maglev/listeners/broadcastable'
 require 'maglev/listeners/event'
 require 'maglev/sidekiq/sidekiq'
+require 'maglev/active_job/base'
 require 'maglev/railtie' if defined?(Rails)
 
 module MagLev
