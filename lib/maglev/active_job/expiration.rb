@@ -1,6 +1,6 @@
 module MagLev
   module ActiveJob
-    module Expire
+    module Expiration
       extend ActiveSupport::Concern
 
       included do

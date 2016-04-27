@@ -3,17 +3,18 @@
 Lift your Rails app with additional conventions and utilities that will turbo charge your development. These include: 
 
 - **Listeners**: Leverage listeners to cleanly manage cross-cutting concerns. 
-- **Service Objects**: Leverage service objects to wrap complicated functionality and easily execute that logic within a backend queue.
 - **Serializers**: JBuilder is slow, use our serializers instead to write clean and maintainable JSON serialization logic.
 - **Current User**: Manage which user is currently acting on the data
-- **Sidekiq Extensions**: Sidekiq is integrated into all conventions with a number of productivity improvements, including:
+- **AciveJob Extensions**: a number of productivity improvements are provided, including:
     - Ability to track the current user across backend tasks
-    - Unique jobs to prevent redundant tasks from being ran
+    - Unique jobs to prevent redundant tasks from being ran (requires Redis)
     - Listener integration
     - Timeouts
-    - Reliability feature (currently requires MongoDB)
-    - Better error handling
+    - Expiration
+    - Reliability feature (requires Redis)
+    - Automatic Retries with configurable backoff
     - Improved serialization for automatically serializing objects via GlobalID, Yaml and special handling for destroyed models
+    - Service Objects - Leverage service objects which are designed to be a more robust way of moving complicated logic into ActiveJob
 - **Statsd Integration**: The framework is preconfigured and ready to start logging essential data with Statsd
 - **Utilities**: Features such as UnitOfWork, Try, Guard, Lock, Memo and error reporting.
 

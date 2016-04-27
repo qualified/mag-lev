@@ -5,7 +5,7 @@ class ExpireJob < MagLev::ActiveJob::Base
   end
 end
 
-describe MagLev::ActiveJob::Base do
+describe MagLev::ActiveJob::Expiration do
   let(:job) { ExpireJob.new }
 
   it 'should execute if future expiration date' do

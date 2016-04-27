@@ -60,7 +60,6 @@ describe MagLev::ActiveJob::EnhancedSerialize do
     it 'should serialize hashes' do
       serialized = serializer.serialize([{key: :value}])
       deserialized = serializer.deserialize(serialized)
-
       expect(deserialized.first).to eq({key: :value})
     end
 

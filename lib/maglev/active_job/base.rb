@@ -5,7 +5,7 @@ require 'maglev/active_job/enhanced_serialize'
 require 'maglev/active_job/arguments'
 require 'maglev/active_job/unique'
 require 'maglev/active_job/timeout'
-require 'maglev/active_job/expire'
+require 'maglev/active_job/expiration'
 require 'maglev/active_job/current_user'
 require 'maglev/active_job/stats'
 require 'maglev/active_job/slow_reporter'
@@ -29,7 +29,7 @@ module MagLev
       include Store
       include Retry
       include Timeout
-      include Expire
+      include Expiration
       include Stats
       include SlowReporter
       include Unique
