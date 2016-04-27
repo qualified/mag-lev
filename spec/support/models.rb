@@ -77,7 +77,7 @@ class Model
         if !validate or valid?
           @new_record = false
           changes_applied
-          self.class.store[id] = attributes
+          self.class.store[id] = attributes.dup
           true
         else
           false
@@ -92,7 +92,7 @@ class Model
       run_callbacks :update do
         if !validate or valid?
           changes_applied
-          self.class.store[id] = attributes
+          self.class.store[id] = attributes.dup
           true
         else
           false
@@ -131,6 +131,10 @@ class Model
     clear_changes_information
     @attributes = self.class.store[id]
     self
+  end
+
+  def ==(other)
+    other.is_a?(self.class) && id.to_s == other.id.to_s
   end
 end
 
