@@ -49,8 +49,8 @@ module MagLev
             MagLev::EventReporter.error(exception, arguments: arguments)
 
             limit = extended_options['retry_limit'].to_i
-            # retries are only enabled when not in test mode and when the limit > 0
-            if limit > 0 and !MagLev.config.active_job.test_mode
+            # retries are only enabled for enqueued jobs when not in test mode and when the limit > 0
+            if limit > 0 and serialized? and !MagLev.config.active_job.test_mode
               if retry_attempt < limit
                 retry_job(wait: retry_delay)
                 true

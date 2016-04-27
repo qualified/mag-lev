@@ -118,6 +118,10 @@ class Model
     save
   end
 
+  def validate!
+    raise 'validation error' unless validate
+  end
+
   def destroy
     self.class.store.delete(id)
     @destroyed = true

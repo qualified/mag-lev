@@ -188,7 +188,7 @@ the service object, making it chainable:
 sync_changes.perform_now.user
 ```
 
-By the way, this is why we called them ServiceObjects and not just Services. Each service acts as its own result object. 
+By the way, this is why they are called ServiceObjects and not just Services. Each service acts as its own result object. 
  
 ```ruby
 result = User::Cleanup.perform_now(user)
@@ -197,7 +197,7 @@ result.other_useful_data_as_a_result_of_the_operation
 ```
 
 > Technically the above example could be done just as easily with a normal ActiveJob, by ensuring that `self` is returned within
-the `perform` method. The point here is that we encourage using the service object pattern this way. It is also encouraged 
+the `perform` method. The point here is that it is encouraged to use the service object pattern this way. It is also encouraged 
 to use jobs for functionality that you don't even intend to run within the background. Any distinct operation that has 
 a non-trivial implementation is a candidate for being a ServiceObject. 
 

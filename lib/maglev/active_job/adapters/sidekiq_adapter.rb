@@ -14,30 +14,28 @@ module ActiveJob
     #   require 'maglev/active_job/adpaters/sidekiq_adapter'
     #   Rails.application.config.active_job.queue_adapter = :sidekiq
     class SidekiqAdapter
-      class << self
-        def enqueue(job) #:nodoc:
-          #Sidekiq::Client does not support symbols as keys
-          Sidekiq::Client.push(base_msg(job))
+      def self.enqueue(job) #:nodoc:
+        #Sidekiq::Client does not support symbols as keys
+        Sidekiq::Clientbu.push(base_msg(job))
+      end
+
+      def self.enqueue_at(job, timestamp) #:nodoc:
+        Sidekiq::Client.push(base_msg(job).merge('at' => timestamp))
+      end
+
+      def self.base_msg(job)
+        msg = {
+          'class' => JobWrapper,
+          'wrapped' => job.class.to_s,
+          'queue' => job.queue_name,
+          'args'  => [ job.serialize ]
+        }
+
+        if job.respond_to?(:extended_options)
+          msg.merge!((job.extended_options['provider_options'] || {}).stringify_keys)
         end
 
-        def enqueue_at(job, timestamp) #:nodoc:
-          Sidekiq::Client.push(base_msg.merge('at' => timestamp))
-        end
-
-        def base_msg(job)
-          msg = {
-            'class' => JobWrapper,
-            'wrapped' => job.class.to_s,
-            'queue' => job.queue_name,
-            'args'  => [ job.serialize ]
-          }
-
-          if job.respond_to?(:extended_options)
-            msg.merge!((job.extended_options['provider_options'] || {}).stringify_keys)
-          end
-
-          msg
-        end
+        msg
       end
     end
   end
