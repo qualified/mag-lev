@@ -19,7 +19,7 @@ module MagLev
 
       def serialize_arguments(arguments)
         if extended_options['enhanced_serialize']
-          Serializer.serialize(arguments)
+          Arguments.serialize(arguments)
         else
           ::ActiveJob::Arguments.serialize(arguments)
         end
@@ -27,13 +27,13 @@ module MagLev
 
       def deserialize_arguments(serialized_args)
         if extended_options['enhanced_serialize']
-          Serializer.deserialize(serialized_args)
+          Arguments.deserialize(serialized_args)
         else
           ::ActiveJob::Arguments.deserialize(serialized_args)
         end
       end
 
-      module Serializer
+      module Arguments
         TYPE_KEY = '_aj_type'.freeze
         SYMBOL_KEYS_KEY = '_aj_symbol_keys'.freeze
         WITH_INDIFFERENT_ACCESS_KEY = '_aj_indifferent_access'.freeze
@@ -56,6 +56,8 @@ module MagLev
                   argument.map { |arg| serialize_argument(arg) }
                 when Hash
                   serialize_hash(argument)
+                when Symbol
+                  serialize_symbol(argument)
                 else
                   if argument.respond_to?(:to_global_id)
                     if argument.respond_to?(:destroyed?) and argument.destroyed?
@@ -136,6 +138,10 @@ module MagLev
             end
           end
 
+          def serialize_symbol(arg)
+            {TYPE_KEY => 'symbol', 'value' => arg.to_s }
+          end
+
           def serialize_destroyed(arg)
             {TYPE_KEY => 'destroyed', 'value' => arg.attributes.to_json, 'class' => arg.class.name }
           end
@@ -153,19 +159,24 @@ module MagLev
           end
 
           def deserialize_argument(argument)
-            if argument.is_a?(Hash)
-              case argument[TYPE_KEY]
-                when 'gid'
-                  ::GlobalID::Locator.locate(argument['value'])
-                when 'yaml'
-                  YAML.load(argument['value'])
-                when 'destroyed'
-                  deserialize_destroyed(argument)
-                else
-                  deserialize_hash(argument)
-              end
-            else
-              argument
+            case argument
+              when Array
+                argument.map { |arg| deserialize_argument(arg) }
+              when Hash
+                case argument[TYPE_KEY]
+                  when 'symbol'
+                    argument['value'].to_sym
+                  when 'gid'
+                    ::GlobalID::Locator.locate(argument['value'])
+                  when 'yaml'
+                    YAML.load(argument['value'])
+                  when 'destroyed'
+                    deserialize_destroyed(argument)
+                  else
+                    deserialize_hash(argument)
+                end
+              else
+                argument
             end
           end
 

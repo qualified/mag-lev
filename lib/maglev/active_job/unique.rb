@@ -43,7 +43,7 @@ module MagLev
         def release_lock
           unless lock.release
             MagLev::Statsd.increment('active_job.unique.already_released')
-            logger.warn "Unique Job: lock for #{lock_key} was ALREADY RELEASED prior to the job completing"
+            logger.warn "Unique Job: lock for #{unique_options['key']} was ALREADY RELEASED prior to the job completing"
           end
         end
 

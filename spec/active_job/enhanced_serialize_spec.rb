@@ -26,6 +26,7 @@ describe MagLev::ActiveJob::EnhancedSerialize do
   let(:user) { User.create }
   let(:yaml) { YamlExample.new }
   let(:job) { EnhancedSerializeJob.new(user, yaml) }
+  let(:serializer) { MagLev::ActiveJob::EnhancedSerialize::Arguments }
 
   before do
     EnhancedSerializeJob.yaml_name = nil
@@ -50,6 +51,24 @@ describe MagLev::ActiveJob::EnhancedSerialize do
       end
     end
 
+    it 'should serialize globalid' do
+      serialized = serializer.serialize([user])
+      deserialized = serializer.deserialize(serialized)
+      expect(deserialized.first).to eq user
+    end
+
+    it 'should serialize hashes' do
+      serialized = serializer.serialize([{key: :value}])
+      deserialized = serializer.deserialize(serialized)
+
+      expect(deserialized.first).to eq({key: :value})
+    end
+
+    it 'should serialize arrays inside of hashes' do
+      serialized = serializer.serialize([{items: [user]}])
+      deserialized = serializer.deserialize(serialized)
+      expect(deserialized.first[:items].first).to eq user
+    end
   end
 
   describe '#was_serialized?' do
