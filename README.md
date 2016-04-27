@@ -169,11 +169,11 @@ class User::SyncChangesWithExternalService < MagLev::ActiveJob::ServiceObject
 end
 ```
 
-Here we use the special `argument` method which declares an argument that will defined. This method will handled initializing
-the argument regardless if being ran in-process or when being handled by a queue. 
+Here we use the special `argument` method which declares that the first argument passed in will be called `user` and 2nd will be called `changes. 
+This method will handled initializing the arguments regardless if being ran in-process or when being handled by a queue. 
 
 It also provides additional features. First, it setup a getter method. Then, using the `type` option, we setup a guard to
-ensure that the value passed in is of the right type. We also setup a :nil check to ensure that the value isn't being passed in as nil.
+ensure that the user value passed in is of the right type. We also setup a :nil check to ensure that the value isn't being passed in as nil.
  
 For the `changes` argument we also setup a block for transforming the value passed in. In this case we simply replace nil values with 
 the `user.changes` value.
