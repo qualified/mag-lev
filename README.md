@@ -40,11 +40,99 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
-
 ### Listeners
 
-TODO
+Listeners are central to the MagLev way of doing things. They are an essential way to extract cross-cutting
+concerns into their own class. For example, say you have an app that sends email, uses Pusher to send websocket
+messages to your client, and your team uses Slack to receive important notifications about your app. You could extract
+all of this functionality out into listeners. 
+
+Lets demonstrate this with a Slack listener:
+
+```ruby
+# app/listeners/slack_listener.rb
+class SlackListener
+    def user_created(user)
+        # use an active job to do the actual work
+        User::NotifyInSlack.perform_later(user)       
+    end
+    
+    # notice that this listener isn't just for users, anything that results in slack messages being created
+    # should be placed in this listener so that you can see all Slack related functionality in one place.
+    def comment_created(post)
+        Comment::NotifyInSlack.perform_later(comment)
+    end
+    
+    # async callback handlers are supported
+    def comment_replied_async(post)
+        # do slack related code inline here, it will be ran within an ActiveJob since the method was suffixed with _async.
+    end
+end
+```
+
+```ruby
+# app/models/user.rb
+class User < ActiveRecord::Base
+    include MagLev::Broadcastable
+    
+    after_create do
+        # notice that we explicitly indicate which listeners should be broadcasted to. This is done
+        # to prevent code indirection. You can still follow what is happening in the flow of data from within this file.  
+        broadcast(:user_created, self).to(SlackListener)
+    end
+end
+```
+```ruby
+# config/initializers/maglev.rb
+MagLev.configure do |config|
+    config.listeners.registrations = [:SlackListener]
+end
+
+```
+
+With listeners you dont have to search through your codebase trying to figure out where and when you send emails, or 
+where all of your cache invalidation is done, etc.
+
+#### Disabling Listeners
+
+There is another huge benefit to listeners. You can turn them off. If you have ever added something like 
+`skip_slack_notifications` into your code then you will know what I mean. When you have functionality
+ wired directly into your models it can slow down your tests, or cause you to embed functionality flags into your
+ code so that you can ignore certain sets of functionality. With listeners all you have to do is this:
+ 
+```ruby
+MagLev.broadcaster.ignore(SlackListener) do
+    
+end
+
+# or if you just want to turn it off completely
+MagLev.broadcaster.ignore(SlackListener)
+
+# or if you want to just turn on specific listeners for a given operation
+MagLev.broadcaster.only(EmailListener) do
+    # only the email listener will be in affect
+end
+```
+
+When combined with our RSpec integration, listeners will be turned off by default within tests. This speeds things
+up greatly when you do not mean to test the full code path. To turn them on is simple:
+
+```ruby
+describe User, listeners: true do
+    # all listeners will be active during these tests
+end
+
+# or if you just want to test a specific listener
+describe User, listeners: SlackListener do
+    # SlackListener will be active during these tests
+end
+
+# or if you just want to test a set of listeners
+describe User, listeners: [SlackListener, MailListener] do
+    # Slack and Email listeners will be active during these tests
+end
+
+```
 
 ### Serializers
 
