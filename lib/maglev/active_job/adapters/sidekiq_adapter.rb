@@ -16,7 +16,7 @@ module ActiveJob
     class SidekiqAdapter
       def self.enqueue(job) #:nodoc:
         #Sidekiq::Client does not support symbols as keys
-        Sidekiq::Clientbu.push(base_msg(job))
+        Sidekiq::Client.push(base_msg(job))
       end
 
       def self.enqueue_at(job, timestamp) #:nodoc:
