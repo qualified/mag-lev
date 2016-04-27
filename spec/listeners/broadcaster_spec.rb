@@ -33,12 +33,7 @@ describe MagLev::Broadcaster do
   let(:broadcasted) { MagLev.broadcaster.broadcasted }
   subject(:broadcaster) { MagLev.broadcaster }
 
-  MagLev.configure do |config|
-    MagLev.config.listeners.test_mode = false
-    MagLev.config.listeners.registrations = [:SharedListener]
-  end
-
-  context 'with specified broadcast_mode' do
+  context 'with specified broadcast_mode', listeners: SharedListener do
     MagLev.config.listeners.broadcast_mode = :specified
 
     describe '#listeners' do
@@ -47,7 +42,7 @@ describe MagLev::Broadcaster do
 
     describe '#broadcast' do
       context 'when only always_enabled groups are active' do
-        it 'should dispatch an event to default group ', listeners: true do
+        it 'should dispatch an event to default group ' do
           user.broadcast(:user_created, user).to(SharedListener, WebListener)
           expect(broadcasted.size).to eq 1
           expect(user.name).to eq 'shared'

@@ -3,27 +3,11 @@ class ServiceObjectGenerator < MagLev::BaseGenerator
     create_file "app/service_objects/#{model_path_root}/#{context_root.underscore}.rb", <<-FILE
 class #{model_class_name}
   class #{context_root} < #{context_base_class_name}
-    attr_reader :#{model_name}
-
-    def initialize(#{model_name})
-      MagLev::Guard.nil(:#{model_name}, #{model_name})
-      @#{model_name} = #{model_name}
-    end
-
-    def logger_name
-      #{model_name}.logger_name
-    end
-
-    def execute_async
-      perform_async(#{model_name})
-    end
+    argument :#{model_name}, type: #{model_class_name}, guard: nil
 
     protected
 
-    def on_execute
-    end
-
-    class Worker < ServiceObjectWorker
+    def on_perform
     end
   end
 end
@@ -40,12 +24,14 @@ describe #{context_class_name} do
   let(:#{model_name}) { create(:#{model_name}) }
   subject(:service) { #{context_class_name}.new(#{model_name}) }
 
-  describe '#execute' do
-    pending
+  describe '#perform' do
+    it 'performs without raising an error' do
+      expect { service.perform_now }.to_not raise_error
+    end
   end
 
-  describe '#execute_async' do
-    it_behaves_like 'Service Object Worker'
+  describe '#perform_later' do
+    it_behaves_like 'Background Job'
   end
 end
     FILE
@@ -53,17 +39,13 @@ end
 
   protected
 
-  def service_object_worker_class_name
-    defined?(ApplicationServiceObjectWorker) ? 'ApplicationServiceObjectWorker' : 'MagLev::ServiceObjectWorker'
-  end
-
   def context_base_class_name
     @view_model_base_class_name ||= begin
       name = "#{model_class_name}::ServiceObject"
       begin
         name.to_const
       rescue
-        defined?(ApplicationServiceObject) ? 'ApplicationServiceObject' : 'MagLev::ServiceObject'
+        defined?(ApplicationServiceObject) ? 'ApplicationServiceObject' : 'MagLev::ActiveJob::Base'
       end
     end
   end

@@ -21,30 +21,21 @@ require 'maglev/facets/string'
 require 'maglev/serialization/serializer'
 require 'maglev/serialization/model_response_serializer'
 require 'maglev/serialization/hash_serializer'
-require 'maglev/service_object'
-require 'maglev/service_object_worker'
 require 'maglev/active_model/when_change'
 require 'maglev/active_model/unit_of_work'
+require 'maglev/active_job/base'
+require 'maglev/active_job/service_object'
+require 'maglev/active_job/deferred_methods'
 require 'maglev/listeners/broadcaster'
 require 'maglev/listeners/broadcastable'
 require 'maglev/listeners/event'
-require 'maglev/sidekiq/sidekiq'
-require 'maglev/active_job/base'
+require 'maglev/integrations/sidekiq' if defined?(Sidekiq)
 require 'maglev/railtie' if defined?(Rails)
 
 module MagLev
 
   class << self
     include MagLev::Memo
-
-    def config
-      @config ||= MagLev::Config.new
-    end
-
-    def configure
-      yield(config) if block_given?
-      config.send(:apply)
-    end
 
     def request_store
       RequestStore.store[:maglev] ||= {}
@@ -80,6 +71,11 @@ module MagLev
       end
     end
 
+    def env_name
+      @env_name ||= defined?(Rails.env) ? Rails.env : (test? ? 'test' : 'default')
+    end
+    attr_writer :env_name
+
     # finds the environment value that is not blank
     def env(*keys)
       keys.map{|key| ENV[key]}.find {|v| !v.blank?}
@@ -102,6 +98,17 @@ module MagLev
       else
         ip = `docker-machine ip #{machine_name}`
         ip ? ip.gsub("\n", '') : nil
+      end
+    end
+
+    # passes a redis instance into the block provided. If Sidekiq is loaded then this will
+    # draw from its connection pool, otherwise Redis.current will be passed in.
+    def redis(&block)
+      if defined?(::Sidekiq)
+        ::Sidekiq.redis(&block)
+      else
+        # TODO: utilize config and our own connection pool
+        block.call(Redis.current)
       end
     end
   end

@@ -7,11 +7,11 @@ class Hash
     self.dup.transform_values!(*keys, &block)
   end
 
-  # same as transform, except that it mutates the current hash
-  def transform_values!(*keys)
+  # same as transform_values, except that it mutates the current hash
+  def transform_values!(*keys, &block)
     keys = self.keys if keys.empty?
     keys.each do |key|
-      self[key] = yield self[key]
+      self[key] = block.arity == 2 ? block.call(key, self[key]) : block.call(self[key])
     end
     self
   end

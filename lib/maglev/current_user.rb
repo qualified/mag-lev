@@ -47,7 +47,7 @@ module MagLev
               self.current = user
               response = block.call
             ensure
-              self.current = previous
+              MagLev.request_store[:user] = previous
               MagLev.request_store[:previous_user] = next_previous
             end
           end

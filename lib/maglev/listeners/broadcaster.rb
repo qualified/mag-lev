@@ -1,3 +1,5 @@
+require 'maglev/active_job/async_job'
+
 module MagLev
   def self.broadcaster
     Broadcaster.instance
@@ -41,7 +43,7 @@ module MagLev
     end
 
     def default_listeners
-      @default_listeners ||= map_to_listener_instances(MagLev.config.listeners.process_registrations)
+      @default_listeners ||= map_to_listener_instances(MagLev.config.listeners.registration_classes)
     end
 
     def listeners
@@ -62,6 +64,20 @@ module MagLev
       end
     end
 
+    # will execute the block provided with only the listeners given
+    def only(*listeners)
+      previous = @listeners
+      @listeners = Set.new
+      listen(*listeners)
+      begin
+        yield
+      ensure
+        @listeners = previous
+      end
+    end
+
+    # ignores the given listeners. If a block is provided (recommended) then it will only
+    # ignore the listenres for the duration of the block execution.
     def ignore(*listeners)
       listeners = map_to_listener_instances(listeners) & self.listeners.to_a
       self.listeners.subtract(listeners)
@@ -125,7 +141,7 @@ module MagLev
           if MagLev.config.listeners.async_listeners
             async_method = "#{event.name}_async"
             if listener.respond_to?(async_method, true)
-              MagLev::Sidekiq::Listeners::Worker.perform_async(listener.class.name, async_method, *event.args)
+              MagLev::ActiveJob::AsyncJob.perform_later(listener.class.name, async_method, *event.args)
               MagLev.logger.info "#{listener.class.name}.#{async_method} queued for background execution"
               event.listened << listener.class.name unless listened
               listened = true

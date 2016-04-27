@@ -1,11 +1,10 @@
 require 'spec_helper'
 
-class MyExampleJob < MagLev::ActiveJob::Base
+class BaseExampleJob < MagLev::ActiveJob::Base
   queue_as :default
   def perform(user)
-    p user
-    # user.name = 'async'
-    # user.save!
+    user.name = 'async'
+    user.save!
   end
 end
 
@@ -14,10 +13,14 @@ describe MagLev::ActiveJob::Base do
 
   before { GlobalID.app = 'default' }
   let(:user) { User.create }
-  let(:job) { MyExampleJob.perform_now(Struct.new(:a).new(1)) }
+  let(:job) { BaseExampleJob.perform_later(user) }
 
   it 'should update the user' do
     job
     expect(user.reload.name).to eq 'async'
+  end
+
+  it 'should have provider_options' do
+    expect(job.extended_options['provider_options']).to eq({})
   end
 end

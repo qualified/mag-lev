@@ -9,7 +9,7 @@ module MagLev
     end
 
     def acquire
-      ::Sidekiq.redis do |redis|
+      MagLev.redis do |redis|
         redis.set(key, Time.now, nx: true, ex: @expiration).tap do |v|
           MagLev.logger.debug { "#{v ? 'Acquired lock' : 'Failed to acquire lock'} #{key}" }
         end
@@ -17,7 +17,7 @@ module MagLev
     end
 
     def release
-      ::Sidekiq.redis do |redis|
+      MagLev.redis do |redis|
         if redis.del(key) == 1
           MagLev.logger.debug { "Released lock #{key}" }
           true
@@ -28,7 +28,7 @@ module MagLev
     end
 
     def locked?
-      ::Sidekiq.redis do |redis|
+      MagLev.redis do |redis|
         !!redis.get(key)
       end
     end
