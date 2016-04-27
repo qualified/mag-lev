@@ -169,7 +169,7 @@ class User::SyncChangesWithExternalService < MagLev::ActiveJob::ServiceObject
 end
 ```
 
-Here we use the special `argument` method which declares that the first argument passed in will be called `user` and 2nd will be called `changes. 
+Here we use the special `argument` method which declares that the first argument passed in will be called `user` and 2nd will be called `changes`. 
 This method will handled initializing the arguments regardless if being ran in-process or when being handled by a queue. 
 
 It also provides additional features. First, it setup a getter method. Then, using the `type` option, we setup a guard to
@@ -195,6 +195,11 @@ result = User::Cleanup.perform_now(user)
 result.stuff_that_was_cleaned_up
 result.other_useful_data_as_a_result_of_the_operation
 ```
+
+> Technically the above example could be done just as easily with a normal ActiveJob, by ensuring that `self` is returned within
+the `perform` method. The point here is that we encourage using the service object pattern this way. It is also encouraged 
+to use jobs for functionality that you don't even intend to run within the background. Any distinct operation that has 
+a non-trivial implementation is a candidate for being a ServiceObject. 
 
 #### Named Arguments
 
