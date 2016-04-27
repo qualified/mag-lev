@@ -70,7 +70,7 @@ module MagLev
                   end
               end
             rescue
-              logger.error("Unable to serialize #{argument}")
+              MagLev.logger.error("Unable to serialize #{argument}")
               raise
             end
           end

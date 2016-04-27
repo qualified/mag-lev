@@ -1,4 +1,5 @@
 require 'active_job'
+require 'yaml'
 require 'active_support/core_ext' # ActiveJob uses core exts, but doesn't require it
 require 'maglev/active_job/extended_options'
 require 'maglev/active_job/enhanced_serialize'
