@@ -25,10 +25,15 @@ module MagLev
         end
       end
 
+      RETRY_SCHEDULE = [0, 1.minute, 5.minutes, 15.minutes, 30.minutes, 2.hours, 4.hours, 8.hours, 12.hours, 24.hours]
+
       # calculates the delay that should be used to retry the job. Can be overridden
       # in a class to customize the retry strategy.
       def retry_delay
-        ((retry_attempt + 1)**(retry_attempt / 2)).minutes
+        # each time we retry, at most we want to
+        schedule = retry_attempt >= RETRY_SCHEDULE.count ? RETRY_SCHEDULE.last : RETRY_SCHEDULE[retry_attempt]
+        # add a degree of randomness to it, but not more than 12 hours
+        schedule + rand([30 + retry_attempt**3, 12.hours].min)
       end
 
       protected
