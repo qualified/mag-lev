@@ -1,6 +1,8 @@
 # MagLev
 
-Lift your Rails app with additional conventions and utilities that will turbo charge your development. These include: 
+Lift your Rails app with additional conventions and utilities that will turbo charge your development. These include:
+ 
+[![Build Status](https://travis-ci.org/jhoffner/mag-lev.svg?branch=master)](https://travis-ci.org/jhoffner/mag-lev)
 
 - **Listeners**: Leverage listeners to cleanly manage cross-cutting concerns. 
 - **Serializers**: JBuilder is slow, use our serializers instead to write clean and maintainable JSON serialization logic.
