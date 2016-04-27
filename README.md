@@ -188,29 +188,36 @@ the service object, making it chainable:
 sync_changes.perform_now.user
 ```
 
+By the way, this is why we called them ServiceObjects and not just Services. Each service acts as its own result object. 
+ 
+```ruby
+result = User::Cleanup.perform_now(user)
+result.stuff_that_was_cleaned_up
+result.other_useful_data_as_a_result_of_the_operation
+```
+
 #### Named Arguments
 
 You can also setup named arguments like so:
 
 ```ruby
-class MyServiceObject < MagLev::ActiveJob::ServiceObject
+class User::Cleanup < MagLev::ActiveJob::ServiceObject
     argument :user
-    argument :name, named: true
-    argument :profile, named: true, type: UserProfile
+    argument :fields_to_clean, named: true, type: Array, default: [:tags]
 end
 
 # called like so
-MyServiceObject.new(user, name: 'User Name', profile: UserProfile.create).enqueue
+User::Cleanup.new(user, fields_to_clean: [:tags, :locations]).enqueue
 
 # or instead using perform_later
-MyServiceObject.perform_later(user, name: 'User Name', profile: UserProfile.create)
+User::Cleanup.perform_later(user, fields_to_clean: [:tags, :locations])
 
 ```
 
 #### Callbacks
 
 ```ruby
-    class MyServiceObject < MagLev::ActiveJob::ServiceObject
+    class User::Cleanup < MagLev::ActiveJob::ServiceObject
         argument :user, type: User, guard: :nil
         
         after_arguments do
@@ -229,13 +236,13 @@ you are never operating on a value that is different from what will be passed to
 To demonstrate this:
 
 ```ruby
-class MyServiceObject < MagLev::ActiveJob::ServiceObject
+class User::Cleanup < MagLev::ActiveJob::ServiceObject
     argument :user, type: User, guard: :nil, default: ->{ User.current }
 end
 
 # On a basic level the above code gets turned into this:
 
-class MyServiceObject < MagLev::ActiveJob::ServiceObject
+class User::Cleanup < MagLev::ActiveJob::ServiceObject
     def name
         arguments[0]
     end
