@@ -100,7 +100,7 @@ module MagLev
         @default_options = HashWithIndifferentAccess.new(
           enhanced_serialize: false,
           unique: true,
-          current_user: true,
+          current_user: false,
           timeout: nil,
           reliable: false,
           listeners: true,

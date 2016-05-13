@@ -37,4 +37,10 @@ describe MagLev::ActiveJob::CurrentUser do
     # double check that the current user was actually restored properly
     expect(User.current).to eq user
   end
+
+  it 'should not track current user by default' do
+    CurrentUserJob.user = user
+    CurrentUserJob.perform_later
+    expect(CurrentUserJob.user).to be_nil
+  end
 end
