@@ -4,7 +4,8 @@ module MagLev
   end
 
   module ActiveModel
-    # Psuedu transaction support for ActiveModel based classes. These are basic client-only
+    # Psuedu transaction support for ActiveModel based classes. Useful for when using a database that does not support
+    # real transactions (such as MongoDB). These are basic client-only
     # transactions where all actual save operations are batched and commited at once. This allows you to save multiple
     # objects in sequence without having to first check that they are all valid.
     # Transactions will only fail if any of the records are invalid.

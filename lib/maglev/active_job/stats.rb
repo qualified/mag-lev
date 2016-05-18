@@ -34,7 +34,7 @@ module MagLev
 
         around_perform do |job, block|
           MagLev::Statsd.next_cycle.increment('active_job.perform.started')
-          MagLev::Statsd.perform("jobs", self.class.name) do
+          MagLev::Statsd.perform("active_job.jobs", self.class.name) do
             block.call
           end
         end

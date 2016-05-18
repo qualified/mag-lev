@@ -46,7 +46,7 @@ module MagLev
           if super
             true
           else
-            MagLev::EventReporter.error(exception, arguments: arguments)
+            logger.report(:error, exception, arguments: arguments)
 
             limit = extended_options['retry_limit'].to_i
             # retries are only enabled for enqueued jobs when not in test mode and when the limit > 0
@@ -67,7 +67,7 @@ module MagLev
 
       def retries_exhausted!
         run_callbacks :retries_exhausted do
-          logger.report(:warn, "Retries have been exhausted. Arguments = #{arguments}")
+          logger.report(:warn, "Retries have been exhausted! Arguments = #{arguments}")
         end
       end
 
