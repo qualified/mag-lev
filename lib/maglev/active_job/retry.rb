@@ -67,7 +67,7 @@ module MagLev
 
       def retries_exhausted!
         run_callbacks :retries_exhausted do
-          logger.report(:warn, "Retries have been exhausted! Arguments = #{arguments}")
+          logger.report(:warn, "Active Job retries have been exhausted", arguments: arguments, job: self.class.name)
         end
       end
 
