@@ -22,12 +22,12 @@ module MagLev
               MagLev::Statsd.increment('sidekiq.stutter_heartbeats')
             end
 
-            interval = MagLev.config.sidekiq.max_heartbeat_interval
-            if interval and last_heartbeat < interval.seconds.ago
-              MagLev::Statsd.increment('sidekiq.exits')
-              MagLev.logger.warn("Heartbeat to spuradic, exiting process expecting supervisor to restart it")
-              exit
-            end
+            # interval = MagLev.config.sidekiq.max_heartbeat_interval
+            # if interval and last_heartbeat < interval.seconds.ago
+            #   MagLev::Statsd.increment('sidekiq.exits')
+            #   MagLev.logger.warn("Heartbeat to spuradic, exiting process expecting supervisor to restart it")
+            #   exit
+            # end
 
             last_heartbeat = Time.now
           end

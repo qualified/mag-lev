@@ -87,8 +87,8 @@ module MagLev
     end
 
     # useful when working within dev environments and configuring fallback urls.
-    def docker_or_local(port)
-      "#{docker_ip.present? ? docker_ip : 'localhost'}:#{port}"
+    def docker_or_local(port = nil)
+      "#{docker_ip.present? ? docker_ip : 'localhost'}#{port ? ":#{port}" : ""}"
     end
 
     # Utility for finding the IP of the docker-machine instance on the machine.
@@ -96,8 +96,14 @@ module MagLev
       @docker_ip ||= if ENV['DOCKER_HOSTS']
         ENV['DOCKER_HOST'].gsub(/tcp:\/\/|:\d*/, '')
       else
-        ip = `docker-machine ip #{machine_name}`
-        ip ? ip.gsub("\n", '') : nil
+        ip = `docker-machine ip #{machine_name}` rescue nil
+        if !ip
+          nil
+        elsif ip.include? 'Error'
+          nil
+        else
+          ip ? ip.gsub("\n", '') : nil
+        end
       end
     end
 
