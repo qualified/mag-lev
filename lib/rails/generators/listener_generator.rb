@@ -1,3 +1,5 @@
+require 'rails/generators/base_generator.rb'
+
 class ListenerGenerator < MagLev::BaseGenerator
   def create_context_file
     create_file "app/listeners/#{class_name.underscore}_listener.rb", <<-FILE

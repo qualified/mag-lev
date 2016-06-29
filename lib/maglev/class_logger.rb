@@ -71,16 +71,20 @@ module MagLev
       end
 
       def report(type, *args)
-        args = args.compact
-        if respond_to?(type)
-          send(type, *args)
-        end
+        begin
+          args = args.compact
+          if respond_to?(type)
+            send(type, *args)
+          end
 
-        hash = args.find {|a| a.is_a? Hash}
-        args << hash = {} unless hash
-        hash[:logger_name] = @instance.logger_name
-        hash[@instance.to_s] = @instance
-        EventReporter.send(type, *args)
+          hash = args.find {|a| a.is_a? Hash}
+          args << hash = {} unless hash
+          hash[:logger_name] = @instance.logger_name
+          # hash[@instance.to_s] = @instance # causes stack too deep errors in some cases
+          EventReporter.send(type, *args)
+        rescue => ex
+          MagLev.logger.error("Failed to report error", ex)
+        end
       end
     end
   end

@@ -1,3 +1,5 @@
+require 'rails/generators/base_generator.rb'
+
 class ServiceObjectGenerator < MagLev::BaseGenerator
   def create_context_file
     create_file "app/service_objects/#{model_path_root}/#{context_root.underscore}.rb", <<-FILE
