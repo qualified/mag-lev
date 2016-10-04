@@ -102,7 +102,11 @@ module MagLev
 
     # broadcastes an event to listeners and spies.
     def broadcast(event, spies_only: false, force_targets: MagLev.config.listeners.broadcast_mode == :specified)
-      return unless enabled?
+      unless enabled?
+        MagLev.logger.info "Broadcaster is disabled, skipping #{event} broadcast"
+        return
+      end
+
       raise EventError.new("Event #{event.event_name} already broadcasted") if event.broadcasted?
 
       if event.targets.none? and force_targets

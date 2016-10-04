@@ -68,7 +68,7 @@ module MagLev
     # a root level will not be tracked.
     # example: perform("jobs", "my_worker") {}
     def self.perform(root, branch = nil, &block)
-      return block.call if MagLev.test?
+      return block.call if MagLev.test? or !self.client
 
       if branch
         branch = "#{root}.#{branch}"
