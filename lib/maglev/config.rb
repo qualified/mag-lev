@@ -129,7 +129,6 @@ module MagLev
       attr_reader :registrations
 
       def registrations=(value)
-        @registration_classes = nil
         @registrations = value.compact
       end
 
@@ -150,12 +149,6 @@ module MagLev
         @registrations = []
         @broadcast_mode = :specified
         @async_listeners = true
-      end
-
-      def registration_classes
-        registrations.map do |r|
-          r.is_a?(Class) ? r : Object.const_get(r)
-        end
       end
     end
   end

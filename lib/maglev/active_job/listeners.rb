@@ -12,7 +12,7 @@ module MagLev
             # if inherit is set then that indicates that we should use the existing set of listeners instead
             # of assuming the defaults on the sidekiq server
             if extended_options['listeners'] == :inherit
-              extended_options['listeners'] = Broadcaster.instance.listeners.map {|l| l.class.name }
+              extended_options['listeners'] = Broadcaster.instance.listener_instances.map {|l| l.class.name }
             end
           end
         end
