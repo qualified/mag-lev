@@ -43,11 +43,11 @@ module MagLev
     end
 
     def default_listeners
-      @default_listeners ||= map_to_listener_instances(MagLev.config.listeners.registration_classes)
+      map_to_listener_instances(MagLev.config.listeners.registration_classes)
     end
 
     def listeners
-      @listeners ||= Set.new(default_listeners)
+      Set.new(default_listeners)
     end
 
     def listen(*listeners)

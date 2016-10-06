@@ -153,7 +153,7 @@ module MagLev
       end
 
       def registration_classes
-        @registration_classes ||= registrations.map do |r|
+        registrations.map do |r|
           r.is_a?(Class) ? r : Object.const_get(r)
         end
       end
