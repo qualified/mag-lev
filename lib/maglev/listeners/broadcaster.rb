@@ -43,23 +43,33 @@ module MagLev
     end
 
     def default_listeners
-      @default_listeners ||= map_to_listener_instances(MagLev.config.listeners.registration_classes)
+      @default_listeners ||= MagLev.config.listeners.registrations.map(&:to_s)
     end
 
-    def listeners
-      @listeners ||= Set.new(default_listeners)
+    def listener_names
+      @listener_names ||= Set.new(default_listeners)
+    end
+
+    def listener_classes
+      listener_names.map do | listener |
+        Object.const_get(listener)
+      end
+    end
+
+    def listener_instances
+      map_to_listener_instances(listener_classes)
     end
 
     def listen(*listeners)
-      listeners = map_to_listener_instances(listeners) - self.listeners.to_a
-      self.listeners.merge(listeners)
+      listener_names = listeners.map(&:to_s) - self.listener_names.to_a
+      self.listener_names.merge(listener_names)
 
       # if a block is given we will only listen until the block is called
       if block_given?
         begin
           yield
         ensure
-          self.listeners.subtract(listeners)
+          self.listener_names.subtract(listeners)
         end
       end
     end
@@ -79,15 +89,15 @@ module MagLev
     # ignores the given listeners. If a block is provided (recommended) then it will only
     # ignore the listenres for the duration of the block execution.
     def ignore(*listeners)
-      listeners = map_to_listener_instances(listeners) & self.listeners.to_a
-      self.listeners.subtract(listeners)
+      listener_names = listeners.map(&:to_s) & self.listener_names.to_a
+      self.listener_names.subtract(listener_names)
 
       # if a block is given we will only listen until the block is called
       if block_given?
         begin
           yield
         ensure
-          self.listeners.merge(listeners)
+          self.listener_names.merge(listeners)
         end
       end
     end
@@ -130,7 +140,7 @@ module MagLev
     protected
 
     def broadcast_listeners
-      listeners.each do | listener |
+      listener_instances.each do | listener |
         if event.targets.empty? or event.targets.include?(listener.class)
           listened = false
 

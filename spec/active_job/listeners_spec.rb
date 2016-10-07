@@ -6,8 +6,7 @@ class ListenerJob < MagLev::ActiveJob::Base
   cattr_accessor :count
 
   def perform(*args)
-    # p MagLev.broadcaster.listeners
-    ListenerJob.count = MagLev.broadcaster.listeners.count
+    ListenerJob.count = MagLev.broadcaster.listener_instances.count
   end
 end
 
@@ -22,7 +21,7 @@ describe MagLev::ActiveJob::Listeners do
   context 'when manually listenining' do
     before do
       MagLev.broadcaster.listen(ListenerJob)
-      expect(MagLev.broadcaster.listeners.count).to eq 1
+      expect(MagLev.broadcaster.listener_instances.count).to eq 1
     end
 
     it 'should not set listeners when they are turned off' do
@@ -37,7 +36,7 @@ describe MagLev::ActiveJob::Listeners do
   end
 
   it 'should configure registered listeners when true', listeners: ListenerJob do
-    expect(MagLev.broadcaster.listeners.count).to eq 1
+    expect(MagLev.broadcaster.listener_instances.count).to eq 1
     job.enqueue(listeners: true)
     expect(ListenerJob.count).to eq 1
   end
