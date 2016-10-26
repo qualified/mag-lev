@@ -33,7 +33,7 @@ end
 class AsyncListener
   def user_created_async(user)
     # only update if the lister was properly included, in order to check that they are infact attached
-    if MagLev.broadcaster.listeners.any? {|l| l.class.name == 'AsyncListener'}
+    if MagLev.broadcaster.listener_instances.any? {|l| l.class.name == 'AsyncListener'}
       user.name = 'async'
       user.save!
     end
@@ -48,8 +48,8 @@ describe MagLev::Broadcaster do
   context 'with specified broadcast_mode', listeners: SharedListener do
     MagLev.config.listeners.broadcast_mode = :specified
 
-    describe '#listeners' do
-      its(:listeners) { should_not be_empty }
+    describe '#listener_instances' do
+      its(:listener_instances) { should_not be_empty }
     end
 
     describe '#broadcast' do
