@@ -6,6 +6,8 @@ module MagLev
   end
 
   class Broadcaster
+    include MagLev::ClassLogger
+
     class << self
       def instance
         MagLev.request_store[:broadcaster] ||= Broadcaster.new
@@ -134,10 +136,31 @@ module MagLev
         if event.targets.empty? or event.targets.include?(listener.class)
           listened = false
 
-          if listener.respond_to?(event.name, true)
-            listener.send(event.name, *event.args)
-            event.listened << listener.class.name
-            listened = true
+          # check for method, both with and without the bang method
+          event_name = if listener.respond_to?(event.name, true)
+            event.name.to_s
+          elsif listener.respond_to?("#{event.name}!", true)
+            "#{event.name}!"
+          end
+
+          if event_name
+            begin
+              listener.send(event_name, *event.args)
+
+            rescue => ex
+              event.errors << ex
+
+              # if the bang method is used, then rethrow the error as it means we intend to halt the listener chain
+              if !MagLev.config.listeners.rescue_listeners || event_name.end_with?('!')
+                raise ex
+              else
+                logger.report(:error, ex)
+              end
+            ensure
+              listened = true
+              event.listened << listener.class.name
+            end
+
             # if the event is marked as completed then break out of the loop
             break if event.completed?
           end

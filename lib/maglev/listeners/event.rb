@@ -1,6 +1,6 @@
 module MagLev
   class Event
-    attr_reader :name, :source, :args, :listened, :targets, :spies_only
+    attr_reader :name, :source, :args, :listened, :targets, :spies_only, :errors
     attr_accessor :parent
 
     def initialize(name, source, *args)
@@ -9,6 +9,7 @@ module MagLev
       @source = source
       @args = args
       @targets = []
+      @errors = []
 
       # this tracks the name of the listeners that were actually broadcasted to.
       @listened = []
@@ -35,6 +36,10 @@ module MagLev
 
     def completed?
       !!@completed
+    end
+
+    def raise_if_errors
+      raise MagLev::EventError.new('One or more errors raised within listener', self) if errors
     end
 
     # true if the event is currently being dispatched but has not completed yet

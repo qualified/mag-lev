@@ -18,6 +18,18 @@ class AdhocListener
   end
 end
 
+class BrokeListener
+  def user_created(user)
+    raise "broke"
+  end
+end
+
+class HaltListener
+  def user_created!(user)
+    raise "halt"
+  end
+end
+
 class AsyncListener
   def user_created_async(user)
     # only update if the lister was properly included, in order to check that they are infact attached
@@ -64,7 +76,7 @@ describe MagLev::Broadcaster do
 
       context 'when adhoc listener is used' do
         it 'should use adhoc listener', listeners: AdhocListener do
-          user.broadcast(:user_created, user).to(SharedListener, WebListener, AdhocListener)
+          user.broadcast(:user_created, user).to(AdhocListener)
           expect(broadcasted.size).to eq 1
           expect(user.name).to eq 'adhoc'
         end
@@ -75,6 +87,26 @@ describe MagLev::Broadcaster do
           user.broadcast(:user_created, user).to(AsyncListener)
           expect(broadcasted.size).to eq 1
           expect(user.reload.name).to eq 'async'
+        end
+      end
+
+      context 'error handling' do
+        describe 'when non-bang method is used', listeners: [BrokeListener, SharedListener]  do
+          it 'should still process the rest of the listener chain' do
+            user.broadcast(:user_created, user).to(BrokeListener, SharedListener)
+            expect(broadcasted.size).to eq 1
+            expect(user.name).to eq 'shared'
+          end
+        end
+
+        describe 'when bang method is used', listeners: [HaltListener, SharedListener] do
+          it 'should not process the rest of the listener chain' do
+            expect {
+              user.broadcast(:user_created, user).to(HaltListener, SharedListener)
+            }.to raise_error
+
+            expect(user.name).to_not eq 'shared'
+          end
         end
       end
     end

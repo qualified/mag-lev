@@ -145,11 +145,16 @@ module MagLev
       # have disabled Sidekiq yaml serialization
       attr_accessor :async_listeners
 
+      # if true (default), an error happening while inside of a listener will be rescued, logged and will not
+      # break the remaining listener event chain.
+      attr_accessor :rescue_listeners
+
       def initialize
         @enabled = true
         @registrations = []
         @broadcast_mode = :specified
         @async_listeners = true
+        @rescue_listeners = true
       end
 
       def registration_classes

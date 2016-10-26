@@ -3,6 +3,12 @@ module MagLev
   end
 
   class EventError < RuntimeError
+    attr_reader :event
+
+    def initialize(msg = nil, event = nil)
+      @event = event
+      super(msg)
+    end
   end
 
   class ResourceNotFoundError < RuntimeError
