@@ -186,7 +186,12 @@ module MagLev
           end
 
           if !listened and event.targets.any?
-            raise EventError.new("event target was specified for #{listener.class.name} that does not support the #{event.name} event")
+            error = "event target was specified for #{listener.class.name} that does not support the #{event.name} event"
+            if MagLev.production?
+              warn error
+            else
+              raise EventError.new error
+            end
           end
         end
       end

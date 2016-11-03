@@ -91,6 +91,21 @@ describe MagLev::Broadcaster do
       end
 
       context 'error handling' do
+        describe 'when unspported event is broadcasted', listeners: [BrokeListener] do
+          let(:broadcast) { user.broadcast(:unspported_event_name, user).to(BrokeListener) }
+          context 'default environment' do
+            it 'should raise' do
+              expect { broadcast }.to raise_error MagLev::EventError
+            end
+          end
+          context 'production' do
+            before { allow(MagLev).to receive(:production?).and_return(true) }
+            it 'should not raise' do
+              expect { broadcast }.to_not raise_error
+            end
+          end
+        end
+
         describe 'when non-bang method is used', listeners: [BrokeListener, SharedListener]  do
           it 'should still process the rest of the listener chain' do
             user.broadcast(:user_created, user).to(BrokeListener, SharedListener)
