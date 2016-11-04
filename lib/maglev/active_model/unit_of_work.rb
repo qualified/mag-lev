@@ -41,7 +41,7 @@ module MagLev
     end
 
     class UnitOfWork
-      attr_reader :parent, :locked, :invalid
+      attr_reader :parent, :locked, :invalid, :models
 
       def initialize(parent, lock_expiration = nil)
         @lock_expiration = lock_expiration || 10
