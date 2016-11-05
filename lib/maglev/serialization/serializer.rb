@@ -58,7 +58,7 @@ module MagLev
     # includable is used, since this enforcement will only be applied IF the inclusion was requested.
     # default can be passed in, which will be used in place of a missing value
     def relation(name, includable: false, serializer: nil, value: nil, allow_nil: false,
-                 default: nil, permission: nil, order_by: nil, &block)
+                 default: nil, permission: nil, order_by: nil, model: self.model, &block)
 
       current_pathname = join_namespace(@namespace, name)
 
