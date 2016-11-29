@@ -45,6 +45,14 @@ module MagLev
         arguments = arguments.present? ? arguments : @serialized_arguments || []
         "[#{job_id}] #{arguments.map(&:to_s)}"
       end
+
+      around_perform do |job, block|
+        msg = "#{self.class.name} Sidekiq Job Performing"
+        data = { arguments: arguments, extended_options: extended_options }
+        MagLev::EventReporter.breadcrumb(msg, data, category: :sidekiq) do
+          block.call
+        end
+      end
     end
   end
 end

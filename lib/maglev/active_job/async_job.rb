@@ -2,7 +2,7 @@ module MagLev
   module ActiveJob
     class AsyncJob < MagLev::ActiveJob::Base
       listeners :inherit
-      reliable true
+      #reliable true
 
       def perform(listener_name, method_name, args)
         MagLev::Statsd.perform("active_job.async_broadcasts.#{listener_name}", method_name) do

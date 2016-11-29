@@ -35,6 +35,20 @@ module MagLev
       context[key] = existing
     end
 
+    def self.breadcrumb(message, data = nil, level: :info, category: :application)
+      if defined? Raven
+        Raven.breadcrumbs.record do |crumb|
+          crumb.message = message
+          crumb.data = data
+          crumb.level = level
+          crumb.category = category
+          yield
+        end
+      else
+        yield
+      end
+    end
+
     def self.log_raven(level, *args)
       str = args.find {|a| a.is_a?(String) }
       ex = args.find {|a| a.is_a?(Exception) }
