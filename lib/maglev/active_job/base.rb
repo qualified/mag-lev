@@ -49,7 +49,7 @@ module MagLev
       around_perform do |job, block|
         msg = "#{self.class.name} Sidekiq Job"
         data = { arguments: arguments, extended_options: extended_options, serialized: serialized? }
-        MagLev::EventReporter.breadcrumb(msg, data, category: :sidekiq) do
+        MagLev::EventReporter.breadcrumb(msg, data, category: :sidekiq, clear: serialized?) do
           block.call
         end
       end

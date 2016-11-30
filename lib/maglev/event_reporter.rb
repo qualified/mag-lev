@@ -28,15 +28,16 @@ module MagLev
       MagLev.request_store[:event_reporter_context] ||= {}
     end
 
-    # sets contextual information for the duration of the block
+    # sets contextual information for the duration of the block. Deprecated. Use breadcrumb instead
     def self.with_context(key, data)
       existing = context[key]
       yield
       context[key] = existing
     end
 
-    def self.breadcrumb(message, data = nil, level: :info, category: :application)
+    def self.breadcrumb(message, data = nil, level: :info, category: :application, clear: false)
       if defined? Raven
+        Raven::BreadcrumbBuffer.clear! if clear
         Raven.breadcrumbs.record do |crumb|
           crumb.message = message
           crumb.data = data
@@ -45,7 +46,9 @@ module MagLev
           yield
         end
       else
-        yield
+        with_context(message, data) do
+          yield
+        end
       end
     end
 
@@ -63,10 +66,11 @@ module MagLev
       if hash
         options[:extra] = hash
         options[:fingerprint] = hash.delete(:fingerprint) if hash[:fingerprint]
+        options[:tags] = hash.delete(:tags) if hash[:tags]
         options[:user] = hash.delete(:user) if hash[:user]
       end
 
-      options[:fingerprint] ||= [str] if str
+      # options[:fingerprint] ||= [str] if str
 
       Raven.send(method, ex || str, options)
     end

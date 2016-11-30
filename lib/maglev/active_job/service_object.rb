@@ -20,12 +20,10 @@ module MagLev
 
       around_perform do |_, block|
         raise "already performed" if performed?
-        EventReporter.with_context(self.class.name, self.arguments) do
-          begin
-            block.call
-          ensure
-            @performed = true
-          end
+        begin
+          block.call
+        ensure
+          @performed = true
         end
       end
 
