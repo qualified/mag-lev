@@ -27,6 +27,8 @@ module MagLev
               RequestStore.store[:maglev] = nil
               block.call
             end
+          else
+            block.call
           end
         end
       end
