@@ -23,4 +23,21 @@ module MagLev
       super(msg)
     end
   end
+
+  # a generic error for indicating invalid data, that is handled outside of the model validation layer
+  class InvalidDataError < RuntimeError
+  end
+
+  # error indicates that data is in an invalid state for the operation
+  class InvalidStateError < RuntimeError
+
+  end
+
+  class DuplicationError < RuntimeError
+
+  end
+
+  class MissingDataError < ActionController::ParameterMissing
+
+  end
 end
