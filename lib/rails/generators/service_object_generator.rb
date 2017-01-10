@@ -47,7 +47,7 @@ end
       begin
         name.to_const
       rescue
-        defined?(ApplicationServiceObject) ? 'ApplicationServiceObject' : 'MagLev::ActiveJob::Base'
+        'ApplicationServiceObject'
       end
     end
   end

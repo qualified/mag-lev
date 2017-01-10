@@ -53,8 +53,6 @@ module MagLev
       # provide meta data for pagination
       if model.respond_to?(:current_page)
         builder.current_page model.current_page
-        builder.next_page    model.next_page
-        builder.prev_page    model.prev_page
         builder.total_pages  model.total_pages
         builder.total_count  (@total_count = model.total_count)
       end
