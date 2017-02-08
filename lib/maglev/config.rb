@@ -103,7 +103,7 @@ module MagLev
           current_user: true,
           timeout: nil,
           reliable: false,
-          listeners: true,
+          listeners: :inherit,
           slow_reporter: nil,
           retry_queue: 'retries',
           retry_limit: 10

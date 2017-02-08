@@ -9,9 +9,9 @@ module MagLev
         before_enqueue do
           # if globally enabled cool
           if Broadcaster.instance.enabled?
-            # if inherit is set then that indicates that we should use the existing set of listeners instead
-            # of assuming the defaults on the sidekiq server
-            if extended_options['listeners'] == :inherit or extended_options['listeners'].nil? and !Broadcaster.instance.default_listeners?
+            # if inherit is set and the defaults are not in scope, then attach them now so we know exactly which ones to use.
+            # If default listeners are being used, we won't attach so as to not take up uneeded space.
+            if extended_options['listeners'] == :inherit and !Broadcaster.instance.default_listeners?
               extended_options['listeners'] = Broadcaster.instance.listener_names.to_a
             end
           end
@@ -28,13 +28,9 @@ module MagLev
 
               # if config is false or the value was left as inherit by the client middleware,
               # then we are not supposed to use listeners
-            elsif config == false or config == 'inherit'
+            elsif config == false
               MagLev.broadcaster.disable! do
                 block.call
-              end
-
-              if config == 'inherit'
-                Rails.logger.info 'Event dispatch is disabled due to the server inheriting a disabled dispatcher'
               end
             else
               block.call
