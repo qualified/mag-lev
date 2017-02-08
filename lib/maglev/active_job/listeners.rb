@@ -11,8 +11,8 @@ module MagLev
           if Broadcaster.instance.enabled?
             # if inherit is set then that indicates that we should use the existing set of listeners instead
             # of assuming the defaults on the sidekiq server
-            if extended_options['listeners'] == :inherit
-              extended_options['listeners'] = Broadcaster.instance.listener_instances.map {|l| l.class.name }
+            if extended_options['listeners'] == :inherit or extended_options['listeners'].nil? and !Broadcaster.instance.default_listeners?
+              extended_options['listeners'] = Broadcaster.instance.listener_names.to_a
             end
           end
         end

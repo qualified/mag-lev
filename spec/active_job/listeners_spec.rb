@@ -10,6 +10,12 @@ class ListenerJob < MagLev::ActiveJob::Base
   end
 end
 
+class ListenerB
+end
+
+class ListenerC
+end
+
 describe MagLev::ActiveJob::Listeners do
   let(:user) { User.create }
   let(:job) { ListenerJob.new }
@@ -32,6 +38,25 @@ describe MagLev::ActiveJob::Listeners do
     it 'should set listeners when they are explicitly inherited' do
       job.enqueue(listeners: :inherit)
       expect(ListenerJob.count).to eq 1
+    end
+
+    it 'should set listeners when they are not defaulted' do
+      MagLev.broadcaster.listen(ListenerJob, ListenerB, ListenerC) do
+        job.enqueue(listeners: :inherit)
+        expect(ListenerJob.count).to eq 3
+      end
+    end
+
+    it 'should set listeners when only is used' do
+      MagLev.broadcaster.listen(ListenerJob, ListenerB, ListenerC) do
+        MagLev.broadcaster.only(ListenerJob, ListenerB) do
+          job.enqueue(listeners: :inherit)
+          expect(ListenerJob.count).to eq 2
+        end
+
+        job.enqueue(listeners: :inherit)
+        expect(ListenerJob.count).to eq 3
+      end
     end
   end
 

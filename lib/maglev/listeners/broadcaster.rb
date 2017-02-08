@@ -44,6 +44,11 @@ module MagLev
       end
     end
 
+    # true if the default listeners are currently being used
+    def default_listeners?
+      default_listeners == listener_names.to_a
+    end
+
     def default_listeners
       @default_listeners ||= MagLev.config.listeners.registrations.map(&:to_s)
     end
@@ -71,7 +76,7 @@ module MagLev
         begin
           yield
         ensure
-          self.listener_names.subtract(listeners)
+          self.listener_names.subtract(listener_names)
         end
       end
     end
@@ -99,7 +104,7 @@ module MagLev
         begin
           yield
         ensure
-          self.listener_names.merge(listeners)
+          self.listener_names.merge(listener_names)
         end
       end
     end
