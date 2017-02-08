@@ -52,6 +52,18 @@ describe MagLev::Broadcaster do
       its(:listener_instances) { should_not be_empty }
     end
 
+    describe '#only' do
+      it 'should only broadcast temporarily to only those specified' do
+        broadcaster.listen(WebListener, SharedListener) do
+          expect(broadcaster.listener_instances.count).to eq 2
+          broadcaster.only(:WebListener) do
+            expect(broadcaster.listener_instances.count).to eq 1
+          end
+          expect(broadcaster.listener_instances.count).to eq 2
+        end
+      end
+    end
+
     describe '#broadcast' do
       context 'when only always_enabled groups are active' do
         it 'should dispatch an event to default group ' do

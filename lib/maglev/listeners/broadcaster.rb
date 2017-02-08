@@ -78,13 +78,13 @@ module MagLev
 
     # will execute the block provided with only the listeners given
     def only(*listeners)
-      previous = @listeners
-      @listeners = Set.new
+      previous = @listener_names
+      @listener_names = Set.new
       listen(*listeners)
       begin
         yield
       ensure
-        @listeners = previous
+        @listener_names = previous
       end
     end
 
