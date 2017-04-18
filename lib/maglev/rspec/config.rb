@@ -6,7 +6,7 @@ module MagLev
           default_options: HashWithIndifferentAccess.new(
             enhanced_serialize: true,
             unique: false,
-            current_user: true,
+            current_user: false,
             timeout: nil,
             reliable: false,
             listeners: :inherit,
