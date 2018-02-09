@@ -62,6 +62,10 @@ module MagLev
       (defined?(Rails.env) && Rails.env.test?) || !!defined?(RSpec)
     end
 
+    def production?
+      env_name == 'production'
+    end
+
     def process_type
       if console? then 'console'
       elsif rake? then 'rake'
