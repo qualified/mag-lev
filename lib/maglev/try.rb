@@ -83,7 +83,11 @@ module MagLev
       rescue => ex
         @results << nil
         failures << [item, ex]
-        MagLev.logger.error(ex)
+        if @target.respond_to?(:logger)
+          @target.logger.error(ex)
+        else
+          MagLev.logger.error(ex)
+        end
 
         # do not bother to log errors to rollbar if we are in the console
         unless defined?(Rails::Console) and Rails.env.development?

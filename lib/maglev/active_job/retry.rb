@@ -25,7 +25,7 @@ module MagLev
         end
       end
 
-      RETRY_SCHEDULE = [0, 1.minute, 5.minutes, 15.minutes, 30.minutes, 2.hours, 4.hours, 8.hours, 12.hours, 24.hours]
+      RETRY_SCHEDULE = [0, 1.minute, 5.minutes, 10.minutes, 15.minutes, 30.minutes, 45.minutes, 1.hours, 2.hours, 4.hours, 8.hours, 12.hours]
 
       # calculates the delay that should be used to retry the job. Can be overridden
       # in a class to customize the retry strategy.

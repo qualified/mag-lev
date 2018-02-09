@@ -2,10 +2,10 @@ require 'rails/generators/base_generator.rb'
 
 class ServiceObjectGenerator < MagLev::BaseGenerator
   def create_context_file
-    create_file "app/service_objects/#{model_path_root}/#{context_root.underscore}.rb", <<-FILE
-class #{model_class_name}
-  class #{context_root} < #{context_base_class_name}
-    argument :#{model_name}, type: #{model_class_name}, guard: nil
+    create_file "app/service_objects/#{file_path}.rb", <<-FILE
+class #{namespace_class}
+  class #{class_parts.last} < #{context_base_class_name}
+    argument :#{namespace_parts.last.underscore}, type: #{namespace_class}, guard: :nil
 
     protected
 
@@ -18,13 +18,13 @@ end
   end
 
   def create_spec_file
-    file_name = "spec/service_objects/#{model_path_root}/#{context_root.underscore}_spec.rb"
+    file_name = "spec/service_objects/#{file_path}_spec.rb"
     create_file file_name, <<-FILE
 require 'rails_helper'
 
-describe #{context_class_name} do
-  let(:#{model_name}) { create(:#{model_name}) }
-  subject(:service) { #{context_class_name}.new(#{model_name}) }
+describe #{class_name} do
+  let(:#{namespace_parts.last.underscore}) { create(:#{namespace_parts.last.underscore}) }
+  subject(:service) { #{class_name}.new(#{namespace_parts.last.underscore}) }
 
   describe '#perform' do
     it 'performs without raising an error' do
@@ -43,7 +43,7 @@ end
 
   def context_base_class_name
     @view_model_base_class_name ||= begin
-      name = "#{model_class_name}::ServiceObject"
+      name = "#{namespace_class}::ServiceObject"
       begin
         name.to_const
       rescue
