@@ -71,6 +71,10 @@ module MagLev
 
       user_can!(permission) if permission
       value ||= model.send(name) || default
+      # allow a proc to be passed in, which can be used to lazy load the value
+      if value.is_a?(Proc)
+        value = value.arity > 0 ? value.call(model) : value.call
+      end
       value = value.order_by(order_by) if order_by and value.respond_to?(:order_by)
       if value
         if value.respond_to?(:each)

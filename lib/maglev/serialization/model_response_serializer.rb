@@ -1,6 +1,6 @@
 module MagLev
   class ModelResponseSerializer < Serializer
-    attr_reader :builder, :serializer, :total_count
+    attr_reader :builder, :total_count
 
     def build
       if model
@@ -42,7 +42,7 @@ module MagLev
           builder.data(array(data, @options[:custom_serializer] || HashSerializer))
         else
           builder.type(data.first.class.name)
-          builder.data(array(data, nil))
+          builder.data(array(data, @options[:custom_serializer]))
         end
       else
         builder.data []
@@ -52,15 +52,15 @@ module MagLev
     def meta_pagination
       # provide meta data for pagination
       if model.respond_to?(:current_page)
-        builder.current_page model.current_page
-        builder.total_pages  model.total_pages
-        builder.total_count  (@total_count = model.total_count)
+        builder.current_page(model.current_page)
+        builder.total_pages(model.total_pages)
+        builder.total_count(@total_count = model.total_count)
       end
     end
 
     def build_single
       builder.type model.class.name
-      builder.data(partial(model, nil))
+      builder.data(partial(model, @options[:custom_serializer]))
     end
   end
 end
