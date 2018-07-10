@@ -2,7 +2,7 @@ require 'active_support/core_ext/module/delegation'
 
 module MagLev
   class Serializer
-    attr_reader :model, :builder, :root, :params, :includer, :include_nil
+    attr_reader :model, :builder, :root, :params, :includer, :include_nil, :options
 
     delegate :includable_query, :includable?, :join_namespace,
              :includes_param, :meta_param, :list?, to: :includer
