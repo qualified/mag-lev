@@ -14,7 +14,7 @@ module MagLev
         around_perform do |job, block|
           if extended_options['timeout']
             begin
-              ::Timeout.timeout([extended_options['timeout'].to_i, 30].max) do
+              ::Timeout.timeout([extended_options['timeout'].to_i, 60].max) do
                 block.call
               end
             rescue ::Timeout::Error

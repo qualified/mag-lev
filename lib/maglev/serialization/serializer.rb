@@ -93,7 +93,7 @@ module MagLev
       serializer = Serializer.from_name(serializer) if serializer.is_a? String
 
       instance = serializer.new(partial_model, includer: @includer, params: @params,
-                                namespace: current_pathname, include_nil: include_nil)
+                                namespace: current_pathname, include_nil: include_nil, **@options)
       instance.to_hash
     end
 
