@@ -2,6 +2,7 @@ module MagLev
   module ActiveJob
     class AsyncJob < MagLev::ActiveJob::Base
       listeners :inherit
+      unique false
       #reliable true
 
       def perform(listener_name, method_name, args)
