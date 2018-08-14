@@ -25,7 +25,15 @@ module MagLev
       class Job < MagLev::ActiveJob::Base
         def perform(object, method, *args)
           MagLev::Statsd.perform("active_job.deferred_methods.#{object.class.name}.#{method}") do
-            object.send(method, *args)
+            parts = method.to_s.split('.')
+            path = object
+            parts.each.with_index do |part, ndx|
+              if ndx < parts.size - 1
+                path = path.send(part)
+              else
+                path.send(part, *args)
+              end
+            end
           end
         end
       end
