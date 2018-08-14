@@ -13,9 +13,13 @@ module MagLev
           @options = options
         end
 
+        def send(name, *args)
+          Job.set(@options).perform_later(@obj, name, *args)
+        end
+
         def method_missing(name, *args)
           if @obj.respond_to?(name)
-            Job.set(@options).perform_later(@obj, name, *args)
+            send(name, *args)
           else
             super
           end
