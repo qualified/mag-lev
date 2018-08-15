@@ -27,7 +27,14 @@ module MagLev
       end
 
       class Job < MagLev::ActiveJob::Base
+        def logger_name
+          "#{super} object class = #{@object&.class&.name}, method = #{@method}"
+        end
+
         def perform(object, method, *args)
+          @object = object
+          @method = method
+
           MagLev::Statsd.perform("active_job.deferred_methods.#{object.class.name}.#{method}") do
             parts = method.to_s.split('.')
             path = object
