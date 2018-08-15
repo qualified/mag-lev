@@ -14,21 +14,24 @@ module MagLev
         end
 
         def send(name, *args)
-          Job.set(@options).perform_later(@obj, name, *args)
+          __perform(name, *args)
         end
 
         def method_missing(name, *args)
           if @obj.respond_to?(name)
-            Job.set(@options).perform_later(@obj, name, *args)
+            __perform(name, *args)
           else
             super
           end
+        end
+
+        def __perform(name, *args)
+          Job.set(@options).perform_later(@obj, name, *args)
         end
       end
 
       class Job < MagLev::ActiveJob::Base
         listeners :inherit
-        unique false
 
         def logger_name
           "#{super} object class = #{@object&.class&.name}, method = #{@method}"

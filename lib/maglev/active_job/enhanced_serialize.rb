@@ -1,3 +1,4 @@
+
 module MagLev
   module ActiveJob
     # this class replaces the default ActiveJob serialization with an enhanced strategy which
