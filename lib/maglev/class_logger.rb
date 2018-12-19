@@ -83,7 +83,8 @@ module MagLev
           # hash[@instance.to_s] = @instance # causes stack too deep errors in some cases
           EventReporter.send(type, *args)
         rescue => ex
-          MagLev.logger.error("Failed to report error", ex)
+          MagLev.logger.warn("Failed to report error:")
+          MagLev.logger.error(ex)
         end
       end
     end
