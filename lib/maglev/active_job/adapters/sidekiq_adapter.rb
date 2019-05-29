@@ -25,7 +25,7 @@ module ActiveJob
 
       def self.base_msg(job)
         msg = {
-          'class' => JobWrapper,
+          'class' => job.job_wrapper || JobWrapper,
           'wrapped' => job.class.to_s,
           'queue' => job.queue_name,
           'args'  => [ job.serialize ]

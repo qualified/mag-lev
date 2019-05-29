@@ -39,6 +39,8 @@ module MagLev
       include CurrentUser
       include TestHelper
 
+      # adapters will wrap a job with its native job, this allows you to override what native job class is used
+      extended_option :job_wrapper
       extended_option(:provider_options) { {} }
 
       def logger_name
