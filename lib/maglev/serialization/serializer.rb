@@ -39,9 +39,11 @@ module MagLev
       names.each do |name|
         value = model.send(name)
         value = default unless value || value == false
-        value = default if value == Float::NAN
-        value = default if value.is_a?(Float) && value.infinite?
-        
+        if value.is_a?(Float)
+          value = default if value&.nan?
+          value = default if value&.infinite?
+        end
+
         name = name.to_s
         if value || value == false
           if name.ends_with?('_id') || name == 'id'
