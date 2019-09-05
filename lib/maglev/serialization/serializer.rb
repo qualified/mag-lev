@@ -38,15 +38,19 @@ module MagLev
     def fields(*names, model: self.model, default: nil)
       names.each do |name|
         value = model.send(name)
-        value = default unless value or value == false
+        value = default unless value || value == false
+        value = default if value == Float::NAN
+        value = default if value.is_a?(Float) && value.infinite?
+        
         name = name.to_s
-        if value or value == false
-          if name.ends_with?('_id') or name == 'id'
+        if value || value == false
+          if name.ends_with?('_id') || name == 'id'
             value = value.to_s
           elsif name.ends_with?('_ids')
             value = value.map(&:to_s)
           end
         end
+
         builder.set!(name, value)
       end
     end
