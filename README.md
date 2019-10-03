@@ -136,11 +136,99 @@ end
 
 ### Serializers
 
-TODO
+MagLev Serializers are pure Ruby objects, unlike jBuilder which typically is used as a templating engine. Though jBuilder is used under the hood, 
+you will not experience any of the slowness typically associated with that tool since templates are never used.
+
+Serializers are used for serializing models, and follows the naming convention of `[ModelName]Serializer`. There are two main methods which are typically used, `fields` and `related`.
+
+Here is an example serializer:
+```ruby
+class UserSerializer < MagLev::Serializer
+  def build
+    fields :email, :name, :first_name, :last_name 
+    related :articles
+  end
+end
+
+class ArticleSerializer < MagLev::Serializer
+  def build
+    fields :title, :body
+    related :categories
+  end
+end
+
+class CategorySerializer < MagLev::Serializer
+  def build
+    fields :label, :article_count
+  end
+end
+```
+
+This example demonstrates the following:
+- The UserSerializer will include 4 fields within the json payload. These names simply need to map to a method on the underlying model.
+- UserSerializer also will have an `articles` array, which uses the model's underlying relation information to determine that `articles` is a collection of `Article` models, and calls the appropriate serializer for each instance.
+- The ArticleSerializer in turn will include its own fields and relations 
+ 
+You would call the serializer like so:
+
+```ruby
+UserSerializer.new(user).to_json
+```
+
+It is also possible to pass params into the serializer, like so:
+
+```ruby
+UserSerializer.new(user, params: {includes: ['articles']}).to_json
+```
+
+In the above example, we passed in an `includes` param value. This is actually a special param that you can make use of.
+
+Let's redefine our serializer examples from above:
+
+```ruby
+class UserSerializer < MagLev::Serializer
+  def build
+    fields :email, :name, :first_name, :last_name 
+    related :articles, includable: true
+  end
+end
+
+class ArticleSerializer < MagLev::Serializer
+  def build
+    fields :title, :body
+    related :categories, includable: true
+  end
+end
+
+class CategorySerializer < MagLev::Serializer
+  def build
+    fields :label, :article_count
+  end
+end
+```
+
+Notice that we now marked our `related` calls with `includable: true`. This means by default, these relations will not be included within our serialized JSON.
+The following demonstrate different ways of utilizing this functionality:
+ 
+```ruby
+# only articles JSON will not be included
+UserSerializer.new(user).to_json         
+# articles but not articles categories JSON will be included
+UserSerializer.new(user, params: {includes: ['articles']}).to_json
+# articles and their categories will be included
+UserSerializer.new(user, params: {includes: ['articles', 'articles.categories']}).to_json
+```
+ 
+This allows you to define API endpoints, where you can optionally pass in what should be included relationally.  
 
 ### Current User
 
-TODO
+Include the `CurrentUser` concern into your user model to provide functionality for tracking a logged in user while handling API requests. 
+
+Once this concern is added to your model, you can simply do `User.current` and `User.current = ` to get and set the current user,
+in a thread safe, request specific way. 
+
+This concern makes use of `MagLev.request_store`, which is a store that you can use for other request/thread-safe global storage.  
 
 ### Active Job Extensions
 
