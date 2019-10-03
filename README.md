@@ -146,14 +146,14 @@ Here is an example serializer:
 class UserSerializer < MagLev::Serializer
   def build
     fields :email, :name, :first_name, :last_name 
-    related :articles
+    relation :articles
   end
 end
 
 class ArticleSerializer < MagLev::Serializer
   def build
     fields :title, :body
-    related :categories
+    relation :categories
   end
 end
 
@@ -189,14 +189,14 @@ Let's redefine our serializer examples from above:
 class UserSerializer < MagLev::Serializer
   def build
     fields :email, :name, :first_name, :last_name 
-    related :articles, includable: true
+    relation :articles, includable: true
   end
 end
 
 class ArticleSerializer < MagLev::Serializer
   def build
     fields :title, :body
-    related :categories, includable: true
+    relation :categories, includable: true
   end
 end
 
@@ -207,7 +207,7 @@ class CategorySerializer < MagLev::Serializer
 end
 ```
 
-Notice that we now marked our `related` calls with `includable: true`. This means by default, these relations will not be included within our serialized JSON.
+Notice that we now marked our `relation` calls with `includable: true`. This means by default, these relations will not be included within our serialized JSON.
 The following demonstrate different ways of utilizing this functionality:
  
 ```ruby
