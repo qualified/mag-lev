@@ -33,7 +33,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'request_store'
   spec.add_dependency 'activesupport'
   spec.add_dependency 'concurrent-ruby'
-  spec.add_development_dependency 'rails'
+
+  if RUBY_VERSION < '2.5'
+    spec.add_development_dependency 'rails', '~> 4.2'
+  else
+    spec.add_development_dependency 'rails', '~> 5.2'
+  end
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rspec-its'
+  if ENV["CI"]
+    spec.add_development_dependency "rspec_junit_formatter"
+  end
 end

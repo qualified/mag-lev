@@ -1,0 +1,58 @@
+ruby-environment: &ruby-environment
+  BUNDLE_JOBS: 3
+  BUNDLE_RETRY: 3
+  REDIS_URL: redis://127.0.0.1:6379
+
+bundle-install: &bundle-install
+  name: Bundle Install
+  command: bundle install
+
+wait-for-redis: &wait-for-redis
+  name: Wait for Redis
+  command: dockerize --wait tcp://127.0.0.1:6379
+
+rspec: &rspec
+  name: RSpec
+  command: |
+    bundle exec rspec \
+      --format RspecJunitFormatter \
+      --out test_results/rspec.xml \
+      --format progress
+
+test-results-path: &test-results-path
+  path: test_results
+
+version: 2
+jobs:
+  ruby-24-rails-4:
+    working_directory: ~/maglev-ruby-24
+    docker:
+      - image: circleci/ruby:2.4
+        environment: *ruby-environment
+      - image: circleci/redis:5.0-alpine
+    steps:
+      - checkout
+      - run: *bundle-install
+      - run: *wait-for-redis
+      - run: *rspec
+      - store_test_results: *test-results-path
+
+  ruby-25-rails-5:
+    working_directory: ~/maglev-ruby-25
+    docker:
+      - image: circleci/ruby:2.5
+        environment: *ruby-environment
+      - image: circleci/redis:5.0-alpine
+    steps:
+      - checkout
+      - run: *bundle-install
+      - run: *wait-for-redis
+      - run: *rspec
+      - store_test_results: *test-results-path
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - ruby-24-rails-4
+      - ruby-25-rails-5
