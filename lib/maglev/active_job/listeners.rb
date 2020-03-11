@@ -29,7 +29,7 @@ module MagLev
               # if config is false or the value was left as inherit by the client middleware,
               # then we are not supposed to use listeners
             elsif config == false
-              MagLev.broadcaster.disable! do
+              MagLev.broadcaster.suspend do
                 block.call
               end
             else

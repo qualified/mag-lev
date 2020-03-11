@@ -1,5 +1,13 @@
 module MagLev
   class Railtie < Rails::Railtie
+    initializer "after_action_operations_queue" do
+      if defined?(ApplicationController)
+        ApplicationController.after_action do
+          MagLev.operations_queue.suspend_listeners_and_drain
+        end
+      end
+    end
+
     config.before_configuration do |app|
       app.config.paths.add "app/service_objects/concerns", eager_load: true
       app.config.paths.add "app/service_objects", eager_load: true

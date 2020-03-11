@@ -51,7 +51,7 @@ module MagLev
           def serialize_argument(argument)
             begin
               case argument
-                when *::ActiveJob::Arguments::TYPE_WHITELIST
+                when NilClass, String, Integer, Float, BigDecimal, TrueClass, FalseClass
                   argument
                 when Array
                   argument.map { |arg| serialize_argument(arg) }

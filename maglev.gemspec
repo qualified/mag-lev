@@ -27,13 +27,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'globalid', '>= 0.3.0'
-  spec.add_dependency 'activemodel'
+  spec.add_dependency 'activemodel', '~> 5.2.0'
   spec.add_dependency 'redis'
-  spec.add_dependency 'activejob'
+  spec.add_dependency 'activejob', '~> 5.2.0'
   spec.add_dependency 'request_store'
-  spec.add_dependency 'activesupport'
+  spec.add_dependency 'activesupport', '~> 5.2.0'
   spec.add_dependency 'concurrent-ruby'
-  spec.add_development_dependency 'rails'
+  spec.add_development_dependency 'rails', '~> 5.2.0'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'rspec-its'
 end

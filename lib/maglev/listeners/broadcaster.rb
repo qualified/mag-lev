@@ -81,6 +81,14 @@ module MagLev
       end
     end
 
+    # more semantic version of only that doesn't take arguments, useful
+    # for when you want to suspend everything temporarily
+    def suspend
+      only do
+        yield
+      end
+    end
+
     # will execute the block provided with only the listeners given
     def only(*listeners)
       previous = @listener_names

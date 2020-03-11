@@ -27,9 +27,6 @@ module MagLev
       end
 
       class Job < MagLev::ActiveJob::Base
-        listeners :inherit
-        unique false
-
         def logger_name
           "#{super} object class = #{@object&.class&.name}, method = #{@method}"
         end

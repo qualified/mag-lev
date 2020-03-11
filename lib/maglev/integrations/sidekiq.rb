@@ -63,7 +63,6 @@ module MagLev
           end
         end
       end
-
-  end
+    end
   end
 end

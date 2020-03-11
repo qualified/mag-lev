@@ -4,7 +4,7 @@ module MagLev
       extend ActiveSupport::Concern
 
       included do
-        # handles wether or not we should use test mode for storing MagLev request store information.
+        # handles whether or not we should use test mode for storing MagLev request store information.
         # In test mode, everything is running inline instead of multi-process, so we need to
         # treat the store as a fresh copy in order to simulate its normal state.
         # Test mode is only used if the job is serialized. Jobs that were not serialized

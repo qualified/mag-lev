@@ -93,7 +93,7 @@ describe MagLev::ActiveModel::UnitOfWorkable do
       expect(e1.label).to eq 'save'
       expect(e1).to be_changed
     end
-
+    
     expect(e1.label).to eq 'save'
     expect(e1).to_not be_changed
   end

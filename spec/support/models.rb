@@ -2,6 +2,7 @@ require 'active_model'
 require 'globalid'
 
 class Model
+  include ActiveModel::AttributeMethods
   include ActiveModel::Model
   include ActiveModel::Dirty
   include ActiveModel::Serialization
@@ -16,29 +17,29 @@ class Model
 
   def self.find(id)
     raise "id cannot be nil" if id.nil?
-    attributes = store[id.to_i]
-    raise "Not Found" unless attributes
-    new(attributes)._load
+    attrs = store[id.to_i]
+    raise "Not Found" unless attrs
+    new(attrs)._load
   end
 
   def self.field(name, default: nil, type: nil)
     define_attribute_methods name
     define_method(name) do
-      value = attributes[name]
+      value = attrs[name]
       if value.nil?
-        value = attributes[name] = default.is_a?(Proc) ? default.call : default
+        value = attrs[name] = default.is_a?(Proc) ? default.call : default
       end
       value
     end
     define_method("#{name}=") do |value|
-      send "#{name}_will_change!" unless attributes[name] == value
-      attributes[name] = value
+      send "#{name}_will_change!" unless attrs[name] == value
+      attrs[name] = value
     end
   end
 
-  def initialize(attributes = {})
-    @attributes = HashWithIndifferentAccess.new(attributes || {})
-    @attributes[:id] ||= rand(999_999_999_999_999)
+  def initialize(attrs = {})
+    @attrs = HashWithIndifferentAccess.new(attrs || {})
+    @attrs[:id] ||= rand(999_999_999_999_999)
     @new_record = true
     super()
   end
@@ -49,25 +50,25 @@ class Model
   end
 
   def id
-    attributes[:id]
+    attrs[:id]
   end
 
-  def attributes
-    @attributes ||= HashWithIndifferentAccess.new
+  def attrs
+    @attrs ||= HashWithIndifferentAccess.new
   end
 
   def as_json(options = nil)
     if options[:only]
-      attributes.slice(options[:only])
+      attrs.slice(options[:only])
     elsif options[:except]
-      attributes.except(options[:except])
+      attrs.except(options[:except])
     else
-      attributes
+      attrs
     end
   end
 
-  def self.create(attributes = {})
-    new(attributes).tap {|m| m.create }
+  def self.create(attrs = {})
+    new(attrs).tap {|m| m.create }
   end
 
   def create(validate: true)
@@ -77,7 +78,7 @@ class Model
         if !validate or valid?
           @new_record = false
           changes_applied
-          self.class.store[id] = attributes.dup
+          self.class.store[id] = attrs.dup
           true
         else
           false
@@ -86,13 +87,17 @@ class Model
     end
   end
 
+  def forget_attribute_assignments
+    # prevents an error
+  end
+
   def update(validate: true)
     raise "not created" unless persisted?
     run_callbacks :save do
       run_callbacks :update do
         if !validate or valid?
           changes_applied
-          self.class.store[id] = attributes.dup
+          self.class.store[id] = attrs.dup
           true
         else
           false
@@ -133,7 +138,7 @@ class Model
 
   def reload
     clear_changes_information
-    @attributes = self.class.store[id]
+    @attrs = self.class.store[id]
     self
   end
 

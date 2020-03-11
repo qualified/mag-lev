@@ -14,6 +14,7 @@ require 'maglev/active_job/retry'
 require 'maglev/active_job/reliable'
 require 'maglev/active_job/listeners'
 require 'maglev/active_job/store'
+require 'maglev/active_job/operations'
 require 'maglev/active_job/test_helper'
 
 unless ActiveJob::Base.method_defined?(:deserialize)
@@ -28,6 +29,7 @@ module MagLev
       include EnhancedSerialize
       include Arguments
       include Store
+      include Operations
       include Retry
       include Timeout
       include Expiration

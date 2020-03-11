@@ -3,16 +3,17 @@ require 'active_support'
 
 require 'maglev/version'
 require 'maglev/errors'
-require 'maglev/guard'
 require 'maglev/config'
 require 'maglev/current_user'
 require 'maglev/logger'
-require 'maglev/try'
-require 'maglev/class_logger'
-require 'maglev/event_reporter'
-require 'maglev/lock'
-require 'maglev/memo'
-require 'maglev/memory_stores'
+require 'maglev/utils/guard'
+require 'maglev/utils/try'
+require 'maglev/utils/class_logger'
+require 'maglev/utils/event_reporter'
+require 'maglev/utils/lock'
+require 'maglev/utils/memo'
+require 'maglev/utils/memory_stores'
+require 'maglev/utils/operations_queue'
 require 'maglev/statsd'
 require 'maglev/facets/hash'
 require 'maglev/facets/object'
@@ -39,6 +40,12 @@ module MagLev
 
     def request_store
       RequestStore.store[:maglev] ||= {}
+    end
+
+    # operations queue. Automatically drained for each job and request, all
+    # others must manually drained
+    def operations_queue
+      request_store[:operations_queue] ||= MagLev::OperationsQueue.new
     end
 
     # true if running within web process. Considered to be true if not running in a rake/sidekiq/console process

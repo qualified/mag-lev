@@ -24,7 +24,7 @@ describe MagLev::ActiveJob::Listeners do
     ListenerJob.count = 0
   end
 
-  context 'when manually listenining' do
+  context 'when manually listening' do
     before do
       MagLev.broadcaster.listen(ListenerJob)
       expect(MagLev.broadcaster.listener_instances.count).to eq 1
