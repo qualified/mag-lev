@@ -54,7 +54,7 @@ module MagLev
     end
 
     def sidekiq?
-      !!::Sidekiq.server?
+      defined?(::Sidekiq) ? !!::Sidekiq.server? : false
     end
 
     def rake?

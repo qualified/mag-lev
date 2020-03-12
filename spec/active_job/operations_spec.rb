@@ -25,10 +25,16 @@ class OperationsExampleJob < MagLev::ActiveJob::Base
   end
 end
 
+module Sidekiq
+  def self.server?
+    true
+  end
+end
+
 describe MagLev::ActiveJob::Operations do
   let(:user) { User.create }
   let(:job) { OperationsExampleJob.new }
-
+  
   context 'without listeners' do
     it 'should not set listeners when they are turned off' do
       job.enqueue
