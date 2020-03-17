@@ -8,18 +8,16 @@ module MagLev
     # # and then juse use memo from within the method body.
     # # i.e.
     # #    def foo
-    # #       memo { 1 + 1 }
+    # #       memo(:foo) { 1 + 1 }
     # #    end
-    # def memo(&block)
-    #   name = caller_locations(1,1)[0].label
-    #   __memoized.fetch(name) { __memoized[name] = instance_eval(&block) }
-    # end
-    #
-    # def keyed_memo(*args, &block)
-    #   name = caller_locations(1,1)[0].label
-    #   memo = __memoized[name] ||= {}
-    #   memo.fetch(args) { memo[args] = instance_exec(*args, &block) }
-    # end
+    def memo(name, &block)
+      @__memoized ||= {}
+      if @__memoized.key?(name)
+        @__memoized[name]
+      else
+        @__memoized[name] = block.call
+      end
+    end
 
     module ClassMethods
       # will update an existing method to be lazy evaluated
