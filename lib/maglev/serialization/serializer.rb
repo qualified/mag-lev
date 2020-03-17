@@ -35,7 +35,7 @@ module MagLev
       builder.attributes!
     end
 
-    def fields(*names, model: self.model, default: nil)
+    def fields(*names, model: self.model, default: nil, camelize: false)
       names.each do |name|
         value = model.send(name)
         value = default unless value || value == false
@@ -51,6 +51,10 @@ module MagLev
           elsif name.ends_with?('_ids')
             value = value.map(&:to_s)
           end
+        end
+
+        if camelize && value.is_a?(Hash)
+          value = value.deep_transform_keys {|key| key.to_s.camelize(:lower) }
         end
 
         builder.set!(name, value)
