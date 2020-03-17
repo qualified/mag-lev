@@ -53,11 +53,17 @@ module MagLev
           end
         end
 
-        if camelize && value.is_a?(Hash)
-          value = value.deep_transform_keys {|key| key.to_s.camelize(:lower) }
-        end
+        value = convert_to_camel_keys(value) if camelize
 
         builder.set!(name, value)
+      end
+    end
+
+    def convert_to_camel_keys(value)
+      case value
+      when Hash then value.deep_transform_keys {|key| key.to_s.camelize(:lower) }
+      when Array then value.map {|v| convert_to_camel_keys(v) }
+      else value
       end
     end
 
