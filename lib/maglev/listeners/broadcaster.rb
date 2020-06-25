@@ -191,7 +191,9 @@ module MagLev
           if MagLev.config.listeners.async_listeners
             async_method = "#{event.name}_async"
             if listener.respond_to?(async_method, true)
-              MagLev::ActiveJob::AsyncJob.perform_later(listener.class.name, async_method, *event.args)
+              # custom async jobs can be defined within the listener class, defaults to MagLev AsyncJob
+              job = defined?(listener.class::AsyncJob) ? listener.class::AsyncJob : MagLev::ActiveJob::AsyncJob
+              job.perform_later(listener.class.name, async_method, *event.args)
               MagLev.logger.info "#{listener.class.name}.#{async_method} queued for background execution"
               event.listened << listener.class.name unless listened
               listened = true

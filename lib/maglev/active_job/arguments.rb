@@ -16,7 +16,7 @@ module MagLev
         # or instantiated at this point. The perform method will make sure that fully optional
         # arguments get initialized but up to that point the arguments will not be handled.
         # As long as you pass at least 1 argument then initialization will be handled as expected.
-        # This abnomality should only be an issue when used with the service object style pattern,
+        # This abnormality should only be an issue when used with the service object style pattern,
         # normal ActiveJob jobs rely on the perform method as the entry point anyway.
         initialize_arguments(*arguments) if arguments.any?
       end
