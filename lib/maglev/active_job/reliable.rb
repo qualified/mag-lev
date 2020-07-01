@@ -37,7 +37,7 @@ module MagLev
       def self.recover(time = 30.minutes.ago)
         MagLev.redis do |conn|
           find_since(time).each do |key, value|
-            job = MagLev::ActiveJob::Base.deserialize(self.job)
+            job = MagLev::ActiveJob::Base.deserialize(JSON.parse(key))
             job.extended_options['reliable_retry'] = true
             job.retry_job
             conn.hdel(self.key, key)
@@ -48,7 +48,7 @@ module MagLev
       protected
 
       def rely_key
-        @rely_key ||= serialize
+        @rely_key ||= serialize.to_json
       end
 
       # adds the job to the reliable collection. Provided as its own method so that a job
@@ -74,7 +74,10 @@ module MagLev
       def ack!
         if @rely
           MagLev.redis {|r| r.hdel(Reliable.key, rely_key) }
-          @rely
+          @rely = false
+          true
+        else
+          false
         end
       end
     end

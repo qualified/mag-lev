@@ -6,6 +6,10 @@ class ServiceObjectGenerator < MagLev::BaseGenerator
 class #{namespace_class}
   class #{class_parts.last} < #{context_base_class_name}
     argument :#{namespace_parts.last.underscore}, type: #{namespace_class}, guard: :nil
+           
+    def logger_name
+      #{namespace_parts.last.underscore}.id  
+    end
 
     protected
 

@@ -34,7 +34,7 @@ describe MagLev::ActiveJob::Reliable do
   end
 
   it 'should clear items from redis after failure' do
-    expect { ReliableJob.perform_later(true) }.to raise_error
+    expect { ReliableJob.perform_later(true) }.to raise_error RuntimeError
     expect(ReliableJob.count).to eq 1
     expect(ReliableJob.found.count).to eq 1
     expect(MagLev::ActiveJob::Reliable.count).to eq 0

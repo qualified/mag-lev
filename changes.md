@@ -1,3 +1,9 @@
+# 0.2.5
+- ServiceObject generator now includes predefined logger_name method 
+
+# 0.2.4
+- Reliable#recover fixed by utilizing JSON to further serialize job hash
+
 # 0.2.3
 - Added ability to optionally define a custom AsyncJob for each listener. This job will be used when handling async events for that given listener.
 - Retry schedule no longer allows an extreme level of randomness
