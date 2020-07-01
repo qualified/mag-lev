@@ -55,10 +55,14 @@ module MagLev
       # could optionally decide to use reliable functionality within its own perform method.
       # A block should be provided so that ack! will be sure to be called
       def rely!(&block)
-        MagLev.redis do |conn|
-          conn.hset(Reliable.key, rely_key, Time.now)
+        begin
+          MagLev.redis do |conn|
+            conn.hset(Reliable.key, rely_key, Time.now)
+          end
+          @rely = true
+        rescue => ex
+          MagLev.logger.report(:error, "Failed to set reliable key", ex)
         end
-        @rely = true
 
         if block
           begin
@@ -73,8 +77,12 @@ module MagLev
       # job could ack before it completes, if the need is there. This method is idempotent.
       def ack!
         if @rely
-          MagLev.redis {|r| r.hdel(Reliable.key, rely_key) }
-          @rely = false
+          begin
+            MagLev.redis {|r| r.hdel(Reliable.key, rely_key) }
+            @rely = false
+          rescue => ex
+            MagLev.logger.report(:error, "Failed to delete reliable key", ex)
+          end
           true
         else
           false

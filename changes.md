@@ -1,3 +1,6 @@
+# 0.2.6
+- Reliable now wraps redis calls in a rescue to ensure that the functionality doesn't cause the actual job to fail
+
 # 0.2.5
 - ServiceObject generator now includes predefined logger_name method 
 
