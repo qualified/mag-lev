@@ -1,3 +1,6 @@
+# 0.2.7
+- Unique now converts arguments to strings before creating a uniqueness key, which should fix issues where jobs were not being treated as unique
+
 # 0.2.6
 - Reliable now wraps redis calls in a rescue to ensure that the functionality doesn't cause the actual job to fail
 

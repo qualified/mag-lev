@@ -53,7 +53,7 @@ module MagLev
 
         def unique_options
           @unique_options ||= extended_option_config(:unique,
-            'key' => "#{self.class.name}:#{Digest::MD5.hexdigest(arguments.to_json)}",
+            'key' => "#{self.class.name}:#{Digest::MD5.hexdigest(arguments.map(&:to_s).to_json)}",
             'timeout' => 10.minutes
           )
         end
