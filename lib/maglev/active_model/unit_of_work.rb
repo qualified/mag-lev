@@ -57,6 +57,10 @@ module MagLev
           parent.add_child(self)
         end
       end
+      
+      def as_json
+        { lock_expiration: @lock_expiration, locked: locked.size, invalid: invalid.size }
+      end
 
       def self.create(lock_expiration: nil, &block)
         raise "Transation block required" unless block_given?

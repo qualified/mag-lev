@@ -1,3 +1,6 @@
+# 0.2.8
+- UnitOfWork as_json added to prevent stack errors when serializing models
+
 # 0.2.7
 - Unique now converts arguments to strings before creating a uniqueness key, which should fix issues where jobs were not being treated as unique
 
