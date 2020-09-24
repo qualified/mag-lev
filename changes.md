@@ -1,3 +1,6 @@
+# 0.2.9
+- DeferredJobs unique options given a better unique key and reduced in timeout
+
 # 0.2.8
 - UnitOfWork as_json added to prevent stack errors when serializing models
 

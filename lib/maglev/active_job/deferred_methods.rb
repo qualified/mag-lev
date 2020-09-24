@@ -47,6 +47,15 @@ module MagLev
             end
           end
         end
+
+        protected
+
+        def unique_options
+          {
+            'key': "DeferredMethod:#{@object.class.name}:#{@method}",
+            'timeout': 5.minutes
+          }
+        end
       end
     end
   end
