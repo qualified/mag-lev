@@ -14,12 +14,20 @@ module MagLev
         end
 
         def send(name, *args)
-          Job.set(@options).perform_later(@obj, name, *args)
+          options = @options.dup
+
+          # if unique options are not set, assume true and set the key to a default
+          if !options[:unique] && options[:unique] != false
+            arguments = args.any? ? Digest::MD5.hexdigest(args.map(&:to_s).to_json) : "no-args"
+            options[:unique] = { 'key' => "DeferredMethod:#{@obj.class.name}:#{@obj.id}:#{name}:#{arguments}" }
+          end
+          
+          Job.set(options).perform_later(@obj, name, *args)
         end
 
         def method_missing(name, *args)
           if @obj.respond_to?(name)
-            Job.set(@options).perform_later(@obj, name, *args)
+            send(name, *args)
           else
             super
           end
@@ -46,15 +54,6 @@ module MagLev
               end
             end
           end
-        end
-
-        protected
-
-        def unique_options
-          {
-            'key' => "DeferredMethod:#{@object.class.name}:#{@method}",
-            'timeout' => 5.minutes
-          }
         end
       end
     end
