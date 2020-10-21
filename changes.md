@@ -1,3 +1,6 @@
+# 0.3.1
+- StatsD updated to use tags instead of multiple measures
+
 # 0.3.0
 - StatsD implementation changed to use statsd-instrument instead of statsd-ruby
 

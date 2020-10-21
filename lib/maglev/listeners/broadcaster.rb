@@ -138,7 +138,7 @@ module MagLev
         raise ConfigurationError.new("broadcast_mode is set to specified but no event targets were given for #{event.name}")
       end
 
-      MagLev::Statsd.perform('broadcasts', event.name) do
+      MagLev::Statsd.perform('broadcasts', { event: event.name }) do
         with_event(event) do
           broadcast_listeners unless spies_only
           broadcast_spies

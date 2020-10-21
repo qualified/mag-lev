@@ -43,7 +43,7 @@ module MagLev
           @object = object
           @method = method
 
-          MagLev::Statsd.perform("active_job.deferred_methods.#{object.class.name}.#{method}") do
+          MagLev::Statsd.perform("active_job.deferred_methods", { class: object.class.name, method: method }) do
             parts = method.to_s.split('.')
             path = object
             parts.each.with_index do |part, ndx|

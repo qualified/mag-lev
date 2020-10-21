@@ -25,35 +25,19 @@ module MagLev
     # a branch to capture 2 different levels of information. if you only pass in one key then
     # a root level will not be tracked.
     # example: perform("jobs", "my_worker") {}
-    def self.perform(root, branch = nil, &block)
+    def self.perform(name, tags, &block)
       return block.call if MagLev.test? or !self.client
-
-      if branch
-        branch = "#{root}.#{branch}"
-      else
-        branch = root
-        root = nil
-      end
 
       if enabled?
         begin
-          StatsD.increment("#{root}.count") if root
-          StatsD.increment("#{branch}.count")
-          branch_perform = -> { StatsD.measure("#{branch}.perform", &block) }
-
-          if root
-            StatsD.measure("#{root}.perform") do
-              branch_perform.call
-            end
-          else
+          StatsD.increment("#{name}.count", tags: tags)
+          StatsD.measure("#{name}.perform", tags: tags) do
             branch_perform.call
           end
 
-          StatsD.increment("#{root}.success") if root
-          StatsD.increment("#{branch}.success")
+          StatsD.increment("#{name}.success", tags: tags)
         rescue Exception
-          StatsD.increment("#{root}.failure") if root
-          StatsD.increment("#{branch}.failure")
+          StatsD.increment("#{name}.failure", tags: tags) if root
           raise
         end
       else
