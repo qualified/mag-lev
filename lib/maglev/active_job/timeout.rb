@@ -18,8 +18,7 @@ module MagLev
                 block.call
               end
             rescue ::Timeout::Error
-              MagLev::Statsd.increment("active_job.timeouts.count")
-              MagLev::Statsd.increment("active_job.timeouts.#{self.class.name}.count")
+              MagLev::Statsd.increment("active_job.timeouts.count", tags: { class: self.class.name })
               raise
             end
           else

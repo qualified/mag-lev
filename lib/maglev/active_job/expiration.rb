@@ -20,8 +20,7 @@ module MagLev
         around_perform do |_, block|
           if extended_options['expires_at']
             if extended_options['expires_at'].to_time < Time.now
-              MagLev::Statsd.increment("active_job.expired")
-              MagLev::Statsd.increment("active_job.expired.#{self.class.name}")
+              MagLev::Statsd.increment("active_job.expired", tags: { class: self.class.name })
               logger.info { "Job is expired" }
               next
             end
