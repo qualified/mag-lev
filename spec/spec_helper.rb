@@ -5,6 +5,7 @@ require 'rspec/its'
 require 'redis'
 require 'maglev'
 require 'maglev/rspec'
+require 'statsd-instrument'
 require File.expand_path('../support/models', __FILE__)
 
 MagLev::Rspec.configure

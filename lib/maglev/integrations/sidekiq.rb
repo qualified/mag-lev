@@ -4,7 +4,7 @@ module MagLev
       module Heartbeat
         def self.start
           set_heartbeat
-          set_metrics_cycle
+          # set_metrics_cycle
         end
 
         protected
@@ -34,34 +34,34 @@ module MagLev
           @task.execute
         end
 
-        def self.set_metrics_cycle
-          MagLev::Statsd.every_cycle do |batch|
-            begin
-              batch.count('sidekiq.processor.failed', ::Sidekiq::Processor::FAILURE.value)
-              batch.count('sidekiq.processor.processed', ::Sidekiq::Processor::PROCESSED.value)
-              batch.count('sidekiq.processor.busy', ::Sidekiq::Processor::WORKER_STATE.size)
-              ::Sidekiq::Queue.all.each do |queue|
-                batch.gauge("sidekiq.queue.#{queue.name}.size", queue.size)
-              end
-
-              stats = ::Sidekiq::Stats.new
-              batch.gauge("sidekiq.processed", stats.processed)
-              batch.gauge("sidekiq.failed", stats.failed)
-              batch.gauge("sidekiq.scheduled_size", stats.scheduled_size)
-              batch.gauge("sidekiq.retry_size", stats.retry_size)
-              batch.gauge("sidekiq.dead_size", stats.dead_size)
-              batch.gauge("sidekiq.processes_size", stats.processes_size)
-              batch.gauge("sidekiq.default_queue_latency", stats.default_queue_latency)
-              batch.gauge("sidekiq.workers_size", stats.workers_size)
-              batch.gauge("sidekiq.enqueued", stats.enqueued)
-
-            rescue Redis::CannotConnectError
-              # just ignore since this is usually a startup issue
-            rescue => ex
-              MagLev.logger.error(ex)
-            end
-          end
-        end
+        # def self.set_metrics_cycle
+        #   MagLev::Statsd.every_cycle do |batch|
+        #     begin
+        #       batch.count('sidekiq.processor.failed', ::Sidekiq::Processor::FAILURE.value)
+        #       batch.count('sidekiq.processor.processed', ::Sidekiq::Processor::PROCESSED.value)
+        #       batch.count('sidekiq.processor.busy', ::Sidekiq::Processor::WORKER_STATE.size)
+        #       ::Sidekiq::Queue.all.each do |queue|
+        #         batch.gauge("sidekiq.queue.#{queue.name}.size", queue.size)
+        #       end
+        #
+        #       stats = ::Sidekiq::Stats.new
+        #       batch.gauge("sidekiq.processed", stats.processed)
+        #       batch.gauge("sidekiq.failed", stats.failed)
+        #       batch.gauge("sidekiq.scheduled_size", stats.scheduled_size)
+        #       batch.gauge("sidekiq.retry_size", stats.retry_size)
+        #       batch.gauge("sidekiq.dead_size", stats.dead_size)
+        #       batch.gauge("sidekiq.processes_size", stats.processes_size)
+        #       batch.gauge("sidekiq.default_queue_latency", stats.default_queue_latency)
+        #       batch.gauge("sidekiq.workers_size", stats.workers_size)
+        #       batch.gauge("sidekiq.enqueued", stats.enqueued)
+        #
+        #     rescue Redis::CannotConnectError
+        #       # just ignore since this is usually a startup issue
+        #     rescue => ex
+        #       MagLev.logger.error(ex)
+        #     end
+        #   end
+        # end
       end
     end
   end

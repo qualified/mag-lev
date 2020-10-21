@@ -121,7 +121,7 @@ module MagLev
     # passes a redis instance into the block provided. If Sidekiq is loaded then this will
     # draw from its connection pool, otherwise Redis.current will be passed in.
     def redis(&block)
-      if defined?(::Sidekiq)
+      if defined?(::Sidekiq) && ::Sidekiq.respond_to?(:redis)
         ::Sidekiq.redis(&block)
       else
         # TODO: utilize config and our own connection pool

@@ -16,9 +16,6 @@ module MagLev
     # you would set this to User (or 'User')
     attr_accessor :current_user_class
 
-    # set to a statsd client instance if you wish to enable metrics tracking throughout the MagLev codebase
-    attr_accessor :statsd
-
     def listeners_enabled?
       !!listeners.enabled
     end
@@ -75,9 +72,9 @@ module MagLev
       end
 
       def apply
-        if defined?(::Sidekiq)
+        if defined?(::Sidekiq) && ::Sidekiq.respond_to?(:configure_server)
           ::Sidekiq.configure_server do |config|
-            if MagLev.config.statsd
+            if MagLev::Statsd.enabled?
               MagLev::Integrations::Sidekiq::Heartbeat.start
             end
           end

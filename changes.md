@@ -1,3 +1,6 @@
+# 0.3.0
+- StatsD implementation changed to use statsd-instrument instead of statsd-ruby
+
 # 0.2.9
 - DeferredJobs unique options given a better unique key and reduced in timeout
 
