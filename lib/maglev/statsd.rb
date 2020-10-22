@@ -26,8 +26,6 @@ module MagLev
     # a root level will not be tracked.
     # example: perform("jobs", "my_worker") {}
     def self.perform(name, tags, &block)
-      return block.call if MagLev.test? or !self.client
-
       if enabled?
         begin
           StatsD.measure("#{name}.perform", tags: tags) do
