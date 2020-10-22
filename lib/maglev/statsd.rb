@@ -30,9 +30,9 @@ module MagLev
 
       if enabled?
         begin
-          StatsD.increment("#{name}.count", tags: tags)
+          StatsD.increment("#{name}.started", tags: tags)
           StatsD.measure("#{name}.perform", tags: tags) do
-            branch_perform.call
+            block.call
           end
 
           StatsD.increment("#{name}.success", tags: tags)

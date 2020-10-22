@@ -21,8 +21,7 @@ module MagLev
         end
 
         around_perform do |job, block|
-          MagLev::Statsd.increment('active_job.perform.started')
-          MagLev::Statsd.perform("active_job.jobs", { class: self.class.name }) do
+          MagLev::Statsd.perform("active_job", { class: self.class.name }) do
             block.call
           end
         end
