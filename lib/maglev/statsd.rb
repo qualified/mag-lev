@@ -36,7 +36,7 @@ module MagLev
 
           StatsD.increment("#{name}.success", tags: tags)
         rescue Exception
-          StatsD.increment("#{name}.failure", tags: tags) if root
+          StatsD.increment("#{name}.failure", tags: tags)
           raise
         end
       else
