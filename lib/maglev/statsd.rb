@@ -30,7 +30,6 @@ module MagLev
 
       if enabled?
         begin
-          StatsD.increment("#{name}.started", tags: tags)
           StatsD.measure("#{name}.perform", tags: tags) do
             block.call
           end
