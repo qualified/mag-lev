@@ -168,8 +168,9 @@ module MagLev
 
           if event_name
             begin
-              listener.send(event_name, *event.args)
-
+              MagLev::Statsd.perform('broadcasts.events', tags: { event: event_name, listener: listener.class.name }) do
+                listener.send(event_name, *event.args)
+              end
             rescue => ex
               event.errors << ex
 

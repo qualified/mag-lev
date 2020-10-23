@@ -25,7 +25,7 @@ module MagLev
     # a branch to capture 2 different levels of information. if you only pass in one key then
     # a root level will not be tracked.
     # example: perform("jobs", "my_worker") {}
-    def self.perform(name, tags, &block)
+    def self.perform(name, tags = {}, &block)
       if enabled?
         begin
           StatsD.measure("#{name}.perform", tags: tags) do

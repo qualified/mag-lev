@@ -1,3 +1,6 @@
+# 0.3.2
+- Added "broadcasts.events" statsd event
+
 # 0.3.1
 - StatsD updated to use tags instead of multiple measures
 
