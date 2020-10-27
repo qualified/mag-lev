@@ -126,7 +126,7 @@ module MagLev
     end
 
     # broadcastes an event to listeners and spies.
-    def broadcast(event, spies_only: false, force_targets: MagLev.config.listeners.broadcast_mode == :specified)
+    def broadcast(event, spies_only: false, force_targets: MagLev.config.listeners.broadcast_mode == :specified, source: nil)
       unless enabled?
         MagLev.logger.info "Broadcaster is disabled, skipping #{event} broadcast"
         return
@@ -138,10 +138,13 @@ module MagLev
         raise ConfigurationError.new("broadcast_mode is set to specified but no event targets were given for #{event.name}")
       end
 
-      MagLev::Statsd.perform('broadcasts', { event: event.name }) do
+      context = { event: event.name, source: source }
+      MagLev::Statsd.perform('broadcasts', context) do
         with_event(event) do
-          broadcast_listeners unless spies_only
-          broadcast_spies
+          MagLev::EventReporter.with_context(:broadcast, context) do
+            broadcast_listeners(source) unless spies_only
+            broadcast_spies
+          end
         end
       end
 
@@ -154,7 +157,7 @@ module MagLev
 
     protected
 
-    def broadcast_listeners
+    def broadcast_listeners(source = nil)
       listener_instances.each do | listener |
         if event.targets.empty? or event.targets.include?(listener.class)
           listened = false
@@ -168,7 +171,7 @@ module MagLev
 
           if event_name
             begin
-              MagLev::Statsd.perform('broadcasts.events', { event: event_name, listener: listener.class.name }) do
+              MagLev::Statsd.perform('broadcasts.events', { event: event_name, listener: listener.class.name, source: source }) do
                 listener.send(event_name, *event.args)
               end
             rescue => ex

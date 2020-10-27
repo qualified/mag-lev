@@ -1,3 +1,6 @@
+# 0.3.3
+- Added "source" as a context value to statsd and event reporter context when broadcasting events
+
 # 0.3.2
 - Added "broadcasts.events" statsd event
 
