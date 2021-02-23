@@ -21,9 +21,16 @@ module MagLev
         end
 
         around_perform do |job, block|
+          set_transaction_name
           MagLev::Statsd.perform("active_job", { class: self.class.name }) do
             block.call
           end
+        end
+      end
+
+      def set_transaction_name(name = self.class.name)
+        if defined?(NewRelic)
+          NewRelic::Agent.set_transaction_name(name)
         end
       end
     end

@@ -1,3 +1,6 @@
+# 0.3.4
+- Added support for ActiveJob NewRelic transaction names, if NewRelic gem is loaded
+
 # 0.3.3
 - Added "source" as a context value to statsd and event reporter context when broadcasting events
 

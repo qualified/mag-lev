@@ -6,6 +6,7 @@ module MagLev
       #reliable true
 
       def perform(listener_name, method_name, args)
+        set_transaction_name("#{listener_name}.#{method_name}")
         MagLev::Statsd.perform("active_job.async_broadcasts", { listener: listener_name, method: method_name }) do
           # MagLev.broadcaster.instance_variable_set('@event', event)
           listener = MagLev.broadcaster.listener_instance(Object.const_get(listener_name))
