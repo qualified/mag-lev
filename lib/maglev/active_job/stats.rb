@@ -30,7 +30,7 @@ module MagLev
 
       def set_transaction_name(name = self.class.name)
         if defined?(NewRelic)
-          NewRelic::Agent.set_transaction_name("ActiveJob/" + name)
+          NewRelic::Agent.set_transaction_name(name)
         end
       end
     end
