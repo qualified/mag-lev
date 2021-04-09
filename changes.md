@@ -1,3 +1,7 @@
+# 0.3.5
+- Clear request store on each Sidekiq job
+- SidekiqAdapter methods switched to instance based 
+
 # 0.3.4
 - Added support for ActiveJob NewRelic transaction names, if NewRelic gem is loaded
 

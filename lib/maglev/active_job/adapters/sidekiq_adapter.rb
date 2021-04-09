@@ -11,19 +11,19 @@ module ActiveJob
     #
     # To use Sidekiq set the queue_adapter config to +:sidekiq+.
     #
-    #   require 'maglev/active_job/adpaters/sidekiq_adapter'
+    #   require 'maglev/active_job/adapters/sidekiq_adapter'
     #   Rails.application.config.active_job.queue_adapter = :sidekiq
     class SidekiqAdapter
-      def self.enqueue(job) #:nodoc:
+      def enqueue(job) #:nodoc:
         #Sidekiq::Client does not support symbols as keys
         Sidekiq::Client.push(base_msg(job))
       end
 
-      def self.enqueue_at(job, timestamp) #:nodoc:
+      def enqueue_at(job, timestamp) #:nodoc:
         Sidekiq::Client.push(base_msg(job).merge('at' => timestamp))
       end
 
-      def self.base_msg(job)
+      def base_msg(job)
         msg = {
           'class' => job.job_wrapper || JobWrapper,
           'wrapped' => job.class.to_s,
@@ -36,6 +36,18 @@ module ActiveJob
         end
 
         msg
+      end
+
+      class JobWrapper #:nodoc:
+        include Sidekiq::Worker
+
+        def perform(job_data)
+          begin
+            Base.execute job_data.merge("provider_job_id" => jid)
+          ensure
+            RequestStore.clear!
+          end
+        end
       end
     end
   end
