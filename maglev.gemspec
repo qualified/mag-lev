@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'redis'
   spec.add_dependency 'activejob', '~> 5.2.0'
   spec.add_dependency 'request_store'
+  spec.add_dependency 'request_store-sidekiq'
   spec.add_dependency 'activesupport', '~> 5.2.0'
   spec.add_dependency 'concurrent-ruby'
   spec.add_development_dependency 'rails', '~> 5.2.0'
