@@ -3,7 +3,7 @@ module MagLev
     initializer "after_action_operations_queue" do
       if defined?(ApplicationController)
         ApplicationController.after_action do
-          MagLev.operations_queue.suspend_listeners_and_drain
+          MagLev.operations_queue.drain
         end
       end
     end

@@ -86,7 +86,7 @@ module MagLev
       end
 
       user_can!(permission) if permission
-      value ||= model.send(name) || default
+      value ||= model.try(name) || default
       # allow a proc to be passed in, which can be used to lazy load the value
       if value.is_a?(Proc)
         value = value.arity > 0 ? value.call(model) : value.call

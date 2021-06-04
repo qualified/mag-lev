@@ -1,7 +1,6 @@
 module MagLev
   module ActiveJob
-    # Drains the operations queue at the end of the job lifecycle. Listeners are turned off during this
-    # periods
+    # Drains the operations queue at the end of the job lifecycle. 
     module Operations
       extend ActiveSupport::Concern
 
@@ -14,7 +13,7 @@ module MagLev
           MagLev.request_store[:entry_job] ||= self
           block.call
           if should_drain
-            MagLev.operations_queue.suspend_listeners_and_drain
+            MagLev.operations_queue.drain
           end
         end
       end

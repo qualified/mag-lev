@@ -1,3 +1,7 @@
+# 0.4
+- operations_queue no longer suspends listeners. Should now do this manually within the operation if the functionality is needed.
+- serializer now tries to default to relation name, instead of sends - in order to prevent issues where the relation might not actually exist on the model
+- fixed guard error message (was missing ending parenthesis)
 # 0.3.5
 - Clear request store on each Sidekiq job
 - SidekiqAdapter methods switched to instance based 
