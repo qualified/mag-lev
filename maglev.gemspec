@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'globalid', '<= 0.4.2'
-  spec.add_dependency 'activemodel', '~> 6.0.0'
+  spec.add_dependency 'activemodel', '>= 6.0.0'
   spec.add_dependency 'redis'
   spec.add_dependency 'activejob', '~> 5.2.0'
   spec.add_dependency 'request_store'
