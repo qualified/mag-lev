@@ -1,3 +1,3 @@
 module MagLev
-  VERSION = "0.4"
+  VERSION = "0.7"
 end

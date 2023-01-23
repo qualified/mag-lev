@@ -12,10 +12,6 @@ module MagLev
 
     attr_reader :adapter
 
-    # set to a model name/class to enable current user functionality. Typically
-    # you would set this to User (or 'User')
-    attr_accessor :current_user_class
-
     def listeners_enabled?
       !!listeners.enabled
     end
@@ -38,26 +34,31 @@ module MagLev
       end
     end
 
+
+    # set to a model name/class to enable current user functionality. Typically
+    # you would set this to User (or 'User')
+    def current_user_class
+      # convert the current_user_class to an actual class if it isnt one already
+      if @current_user_class.is_a?(String) || @current_user_class.is_a?(Symbol)
+        self.current_user_class = Object.const_get(@current_user_class.to_s)
+      end
+
+      @current_user_class
+    end
+
+    def current_user_class=(val)
+      # automatically include the current user concern into the user class
+      if val.is_a?(Class)
+        val.include MagLev::CurrentUser
+      end
+      @current_user_class = val
+    end
+
     protected
 
     def apply
-      apply_current_user
       sidekiq.send(:apply)
       @applied = true
-    end
-
-    # TODO: using the "inherited" method this could probaby be automated
-    def apply_current_user
-      # convert the current_user_class to an actual class if it isnt one already
-      if current_user_class.is_a?(String) or current_user_class.is_a?(Symbol)
-        self.current_user_class = Object.const_get(current_user_class.to_s)
-      end
-
-      # automatically include the current user concern into the user class
-      # TODO: figure out why this isnt working with rspec (probably a spring issue)
-      if current_user_class
-        current_user_class.include MagLev::CurrentUser
-      end
     end
 
     class Sidekiq

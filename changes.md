@@ -1,3 +1,9 @@
+# 0.7
+- Updated dependencies (activemodel, activejob, activesupport, rails) for compatibility with rails 6.1
+# 0.6
+- current_user_class now sets to an object lazily, which fixes issues with autoloading constants during Rails initialization
+# 0.5
+- Updated dependencies (activemodel, activejob, activesupport, rails) for compatibility with rails 6.0
 # 0.4
 - operations_queue no longer suspends listeners. Should now do this manually within the operation if the functionality is needed.
 - serializer now tries to default to relation name, instead of sends - in order to prevent issues where the relation might not actually exist on the model
