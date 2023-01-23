@@ -1,4 +1,6 @@
 # 0.6
+- Updated dependencies (activemodel, activejob, activesupport, rails) for compatibility with rails 6.1
+# 0.6
 - current_user_class now sets to an object lazily, which fixes issues with autoloading constants during Rails initialization
 # 0.5
 - Updated dependencies (activemodel, activejob, activesupport, rails) for compatibility with rails 6.0
