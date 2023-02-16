@@ -2,8 +2,8 @@ require 'concurrent'
 
 module MagLev
   module Statsd
-    def self.method_missing(*args, &block)
-      statsd_call(*args, &block)
+    def self.method_missing(*args, **kwargs, &block)
+      statsd_call(*args, **kwargs, &block)
     end
 
     def self.enabled?
@@ -13,9 +13,9 @@ module MagLev
       @enabled
     end
 
-    def self.statsd_call(*args, &block)
+    def self.statsd_call(*args, **kwargs, &block)
       if enabled? && StatsD.respond_to?(args.first)
-        StatsD.send(*args, &block)
+        StatsD.send(*args, **kwargs, &block)
       else
         block.call if block
       end
