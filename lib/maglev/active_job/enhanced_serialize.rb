@@ -37,6 +37,7 @@ module MagLev
       module Arguments
         TYPE_KEY = '_aj_type'.freeze
         SYMBOL_KEYS_KEY = '_aj_symbol_keys'.freeze
+        RUBY2_KEYWORDS_KEY = "_aj_ruby2_keywords".freeze
         WITH_INDIFFERENT_ACCESS_KEY = '_aj_indifferent_access'.freeze
 
         class << self
@@ -55,8 +56,18 @@ module MagLev
                   argument
                 when Array
                   argument.map { |arg| serialize_argument(arg) }
+                when ActiveSupport::HashWithIndifferentAccess
+                  serialize_indifferent_hash(argument)
                 when Hash
-                  serialize_hash(argument)
+                  symbol_keys = argument.each_key.grep(Symbol).map!(&:to_s)
+                  aj_hash_key = if Hash.ruby2_keywords_hash?(argument)
+                                  RUBY2_KEYWORDS_KEY
+                                else
+                                  SYMBOL_KEYS_KEY
+                                end
+                  result = serialize_hash(argument)
+                  result[aj_hash_key] = symbol_keys
+                  result
                 when Symbol
                   serialize_symbol(argument)
                 else
@@ -79,43 +90,35 @@ module MagLev
           RESERVED_KEYS = [
             TYPE_KEY, TYPE_KEY.to_sym,
             SYMBOL_KEYS_KEY, SYMBOL_KEYS_KEY.to_sym,
+            RUBY2_KEYWORDS_KEY, RUBY2_KEYWORDS_KEY.to_sym,
             WITH_INDIFFERENT_ACCESS_KEY, WITH_INDIFFERENT_ACCESS_KEY.to_sym
           ]
 
           def serialize_hash(argument)
-            hash = {}
-            if argument.is_a?(ActiveSupport::HashWithIndifferentAccess)
-              hash[WITH_INDIFFERENT_ACCESS_KEY] = true
-            else
-              hash[SYMBOL_KEYS_KEY] = argument.each_key.grep(Symbol).map(&:to_s)
-            end
-
-            argument.each do |key, value|
+            argument.each_with_object({}) do |(key, value), hash|
               hash[serialize_hash_key(key)] = serialize_argument(value)
             end
+          end
 
-            hash
+          def serialize_indifferent_hash(indifferent_hash)
+            result = serialize_hash(indifferent_hash)
+            result[WITH_INDIFFERENT_ACCESS_KEY] = true
+            result
           end
 
           def deserialize_hash(argument)
             result = argument.transform_values { |v| deserialize_argument(v) }
             if result.delete(WITH_INDIFFERENT_ACCESS_KEY)
-              result.with_indifferent_access
+              result = result.with_indifferent_access
             elsif symbol_keys = result.delete(SYMBOL_KEYS_KEY)
-              transform_symbol_keys(result, symbol_keys)
+              result = transform_symbol_keys(result, symbol_keys)
+            elsif symbol_keys = result.delete(RUBY2_KEYWORDS_KEY)
+              result = transform_symbol_keys(result, symbol_keys)
+              result = Hash.ruby2_keywords_hash(result)
             else
               result
             end
-          end
-
-          def transform_symbol_keys(hash, symbol_keys)
-            hash.transform_keys do |key|
-              if symbol_keys.include?(key)
-                key.to_sym
-              else
-                key
-              end
-            end
+            result
           end
 
           def serialize_hash_key(key)
