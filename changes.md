@@ -1,3 +1,5 @@
+# 0.8
+- Updated enhanced serialize and arguments to handle keyword arguments for Ruby 3.0
 # 0.7
 - Updated dependencies (activemodel, activejob, activesupport, rails) for compatibility with rails 6.1
 # 0.6

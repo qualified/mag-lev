@@ -9,7 +9,7 @@ module MagLev
 
       attr_reader :named_arguments
 
-      def initialize(*arguments)
+      def initialize(*arguments, **kwargs)
         super
         # NOTE that due to the way ActiveJob is designed, we are unable to support
         # fully optional arguments since we do wont be able to know if the object is being deserialized
@@ -18,7 +18,7 @@ module MagLev
         # As long as you pass at least 1 argument then initialization will be handled as expected.
         # This abnormality should only be an issue when used with the service object style pattern,
         # normal ActiveJob jobs rely on the perform method as the entry point anyway.
-        initialize_arguments(*arguments) if arguments.any?
+        initialize_arguments(*arguments, **kwargs) if arguments.any? || kwargs.any?
       end
 
       protected
@@ -30,11 +30,12 @@ module MagLev
 
       # runs through all of the defined arguments and runs the processing function
       # for each, resulting in guards and defaults being applied.
-      def initialize_arguments(*arguments)
+      def initialize_arguments(*arguments, **kwargs)
         unless @arguments_initialized
           run_callbacks :arguments do
             @arguments_initialized = true
             arguments = self.arguments if arguments.empty?
+            arguments << kwargs if kwargs.any?
 
             self.class.arguments.values.map.with_index do |config, ndx|
               self.arguments[ndx] = config.call(self, arguments[ndx])
@@ -42,7 +43,7 @@ module MagLev
 
             if self.class.named_arguments.any?
               if arguments.count > self.class.arguments.count
-                @named_arguments = arguments.last
+                self.arguments << @named_arguments = arguments.pop
               else
                 self.arguments << @named_arguments = {}
               end
