@@ -43,7 +43,7 @@ module MagLev
 
             if self.class.named_arguments.any?
               if arguments.count > self.class.arguments.count
-                @named_arguments = arguments.last
+                self.arguments << @named_arguments = arguments.pop
               else
                 self.arguments << @named_arguments = {}
               end

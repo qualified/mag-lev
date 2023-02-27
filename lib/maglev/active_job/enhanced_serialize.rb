@@ -70,6 +70,8 @@ module MagLev
                   result
                 when Symbol
                   serialize_symbol(argument)
+                when -> (arg) { arg.respond_to?(:permitted?) }
+                  serialize_indifferent_hash(argument.to_h)
                 else
                   if argument.respond_to?(:to_global_id)
                     if argument.respond_to?(:destroyed?) and argument.destroyed?
@@ -109,16 +111,15 @@ module MagLev
           def deserialize_hash(argument)
             result = argument.transform_values { |v| deserialize_argument(v) }
             if result.delete(WITH_INDIFFERENT_ACCESS_KEY)
-              result = result.with_indifferent_access
+              result.with_indifferent_access
             elsif symbol_keys = result.delete(SYMBOL_KEYS_KEY)
-              result = transform_symbol_keys(result, symbol_keys)
+              transform_symbol_keys(result, symbol_keys)
             elsif symbol_keys = result.delete(RUBY2_KEYWORDS_KEY)
               result = transform_symbol_keys(result, symbol_keys)
-              result = Hash.ruby2_keywords_hash(result)
+              Hash.ruby2_keywords_hash(result)
             else
               result
             end
-            result
           end
 
           def serialize_hash_key(key)
