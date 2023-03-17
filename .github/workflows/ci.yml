@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+# Ensures that only one task per branch/environment will run at a time.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-20.04
+    services:
+      redis:
+        image: redis:5.0-alpine
+        ports:
+          - 6379/tcp
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Ruby
+        # Use version from `.ruby-version`
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: RSpec
+        run: bundle exec rspec --color --backtrace --format progress
+        env:
+          REDIS_URL: redis://localhost:${{ job.services.redis.ports[6379] }}
