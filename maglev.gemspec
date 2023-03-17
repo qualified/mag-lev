@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'globalid', '<= 0.4.1'
   spec.add_dependency 'activemodel', '>= 6.0.0'
-  spec.add_dependency 'redis'
+  spec.add_dependency 'redis', '< 5.0.0'
   spec.add_dependency 'activejob', '>= 6.0.0'
   spec.add_dependency 'request_store'
   spec.add_dependency 'activesupport', '>= 6.0.0'
