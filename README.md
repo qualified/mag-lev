@@ -1,5 +1,6 @@
 # MagLev
-[![Build Status](https://travis-ci.org/jhoffner/mag-lev.svg?branch=master)](https://travis-ci.org/jhoffner/mag-lev)
+
+[![CI](https://github.com/qualified/mag-lev/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/qualified/mag-lev/actions/workflows/ci.yml)
 
 Lift your Rails app with additional conventions and utilities that will turbo charge your development. These include:
  
