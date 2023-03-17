@@ -1,3 +1,5 @@
+# 0.8.1
+- Require `redis` gem older than v5.0.
 # 0.8
 - Updated enhanced serialize and arguments to handle keyword arguments for Ruby 3.0
 # 0.7
