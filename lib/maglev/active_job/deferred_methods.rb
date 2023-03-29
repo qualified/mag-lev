@@ -13,7 +13,7 @@ module MagLev
           @options = options
         end
 
-        def send(name, *args)
+        def send(name, *args, **kwargs)
           options = @options.dup
 
           # if unique options are not set, assume true and set the key to a default
@@ -22,12 +22,12 @@ module MagLev
             options[:unique] = { 'key' => "DeferredMethod:#{@obj.class.name}:#{@obj.id}:#{name}:#{arguments}" }
           end
           
-          Job.set(options).perform_later(@obj, name, *args)
+          Job.set(options).perform_later(@obj, name, *args, **kwargs)
         end
 
-        def method_missing(name, *args)
+        def method_missing(name, *args, **kwargs)
           if @obj.respond_to?(name)
-            send(name, *args)
+            send(name, *args, **kwargs)
           else
             super
           end
@@ -39,7 +39,7 @@ module MagLev
           "#{super} object class = #{@object&.class&.name}, method = #{@method}"
         end
 
-        def perform(object, method, *args)
+        def perform(object, method, *args, **kwargs)
           @object = object
           @method = method
 
@@ -50,7 +50,7 @@ module MagLev
               if ndx < parts.size - 1
                 path = path.send(part)
               else
-                path.send(part, *args)
+                path.send(part, *args, **kwargs)
               end
             end
           end

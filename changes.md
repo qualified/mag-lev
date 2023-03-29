@@ -1,3 +1,5 @@
+# 0.8.2
+- Updated DeferredMethods for compatibility with Ruby 3.0 keyword arguments.
 # 0.8.1
 - Require `redis` gem older than v5.0.
 # 0.8
