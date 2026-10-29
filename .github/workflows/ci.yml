@@ -38,7 +38,8 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Show Rails version
-        run: bundle exec ruby -e 'require "rails"; puts "Rails #{Rails.version}"'
+        run: |
+          bundle exec ruby -e 'require "rails"; puts "Rails #{Rails.version}"'
       - name: RSpec
         run: bundle exec rspec --color --backtrace --format progress
         env:
