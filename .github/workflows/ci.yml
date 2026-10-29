@@ -13,7 +13,17 @@ concurrency:
 jobs:
   test:
     if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]')"
-    runs-on: ubuntu-20.04
+    name: ruby ${{ matrix.ruby }} / rails ${{ matrix.rails }}
+    runs-on: ubuntu-latest
+    # Rails 7.0 is expected to fail until QUAL-2629 lands; remove this then.
+    continue-on-error: ${{ matrix.rails == '7.0' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ['3.0', '3.1']
+        rails: ['6.1', '7.0']
+    env:
+      BUNDLE_GEMFILE: gemfiles/rails_${{ matrix.rails == '6.1' && '6_1' || '7_0' }}.gemfile
     services:
       redis:
         image: redis:5.0-alpine
@@ -23,10 +33,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Ruby
-        # Use version from `.ruby-version`
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Show Rails version
+        run: bundle exec ruby -e 'require "rails"; puts "Rails #{Rails.version}"'
       - name: RSpec
         run: bundle exec rspec --color --backtrace --format progress
         env:
