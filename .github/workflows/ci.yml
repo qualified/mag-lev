@@ -14,7 +14,7 @@ jobs:
   test:
     if: "!contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.head_commit.message, '[skip ci]')"
     name: ruby ${{ matrix.ruby }} / rails ${{ matrix.rails }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # ubuntu-latest is 26.04, which has no prebuilt Ruby 3.0/3.1
     # Rails 7.0 still fails the when_change `errors[field] <<` specs (Rails 7
     # frozen errors; separate from QUAL-2684, which fixed Mongoid 8 dirty
     # tracking). Ruby 3.1 fails
