@@ -90,6 +90,20 @@ module MagLev
           end
         end
 
+        # Mongoid ignores `attribute_was` inside after_* callbacks, so remember the persisted value in
+        # before_save. A save made from inside one of our callback blocks (depth > 0) must not overwrite
+        # it, or the callbacks that run after it would see from == to.
+        def capture_from_value(field)
+          captured = (@klass.instance_variable_get(:@_maglev_captured_fields) || @klass.instance_variable_set(:@_maglev_captured_fields, []))
+          return if captured.include?(field)
+
+          captured << field
+          @klass.before_save(prepend: true) do
+            @_maglev_from_values ||= {}
+            @_maglev_from_values[field] = self.send("#{field}_was") unless @_maglev_depth.to_i > 0
+          end
+        end
+
         def add_callback(callback, method = nil, &block)
           raise "from must be specified" if @from_values.nil?
           raise "to must be specified" if @to_values.nil?
@@ -98,14 +112,15 @@ module MagLev
           to_values = @to_values
           field = @field
           running = @running
-          after_callback = callback.to_s.start_with?('after_')
+          after_callback = [:after_save, :after_update, :after_create].include?(callback)
+          capture_from_value(field) if after_callback
 
           @klass.send(callback) do
-            # Mongoid 8 makes `attribute_was` return the new value inside after_*
-            # callbacks, so read the pre-save value from the last save instead.
+            # Mongoid 8 makes `attribute_was` return the new value inside after_* callbacks, so use
+            # the value captured in before_save.
             from =
-              if after_callback && respond_to?(:attribute_before_last_save)
-                attribute_before_last_save(field)
+              if after_callback && @_maglev_from_values&.key?(field)
+                @_maglev_from_values[field]
               else
                 self.send("#{field}_was")
               end
@@ -121,10 +136,15 @@ module MagLev
                 if from != to
                   if from_values == :* || from_values.include?(from)
                     if to_values == :* || to_values.include?(to)
-                      if method
-                        self.send(method)
-                      else
-                        instance_exec(from, to, &block)
+                      @_maglev_depth = @_maglev_depth.to_i + 1
+                      begin
+                        if method
+                          self.send(method)
+                        else
+                          instance_exec(from, to, &block)
+                        end
+                      ensure
+                        @_maglev_depth -= 1
                       end
                     end
                   end

@@ -1,5 +1,5 @@
 # 0.9.0
-- `when_change` after_* callbacks read the "from" value with `attribute_before_last_save` when available (Mongoid 8.1+), since `attribute_was` returns the new value inside after callbacks on Mongoid 8. Falls back to `_was` for plain ActiveModel. Release together with the Qualified Mongoid 8.1 bump.
+- `when_change` after_save/after_update/after_create callbacks read the "from" value captured in before_save, since `attribute_was` returns the new value inside after callbacks on Mongoid 8. A save made from inside a callback block no longer hides the original value from later callbacks. Release together with the Qualified Mongoid 8.1 bump.
 # 0.8.3
 - Updated GlobalID Gemspec dependency
 # 0.8.1

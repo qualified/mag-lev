@@ -17,6 +17,8 @@ Mongoid.logger.level = Logger::WARN
 
 # Mongoid 8 reports `attribute_was` as the new value inside after_* callbacks,
 # so these specs only pass if when_change reads the pre-save value another way.
+INIT_LOG = []
+
 class WhenChangeMongoidExample
   include Mongoid::Document
   include MagLev::ActiveModel::WhenChange
@@ -33,6 +35,8 @@ class WhenChangeMongoidExample
     .from(nil).to('create').after_create { results << :after_create }
     .from('x').to('y').after_update { results << :after_update }
     .from('r').to('s').after_save { self.active = true; save }
+    .from('r').to('s').after_save { results << :after_resave }
+    .from(nil).to_any.after_initialize { INIT_LOG << name }
 
   when_change(:active)
     .from(nil).to(true).after_save { results << :active_set }
@@ -102,5 +106,21 @@ describe MagLev::ActiveModel::WhenChange, 'with Mongoid after_* callbacks' do
     example.save!
     expect(example.results).to include(:active_set)
     expect(WhenChangeMongoidExample.find(example.id).active).to eq true
+  end
+
+  it 'still fires later callbacks on the same field after a recursive save' do
+    example.name = 'r'
+    example.save!
+    example.name = 's'
+    example.save!
+    expect(example.results).to include(:after_resave)
+  end
+
+  it 'does not fire after_initialize for a document loaded from the database' do
+    example.name = 'a'
+    example.save!
+    INIT_LOG.clear
+    WhenChangeMongoidExample.find(example.id)
+    expect(INIT_LOG).to be_empty
   end
 end
