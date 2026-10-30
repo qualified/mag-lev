@@ -1,6 +1,9 @@
 require 'spec_helper'
 require 'mongoid'
 
+# requiring mongoid defines Rails, and MagLev.logger then picks up a nil Rails.logger
+Rails.logger ||= Logger.new(IO::NULL) if Rails.respond_to?(:logger=)
+
 Mongoid.load_configuration(
   clients: {
     default: {
@@ -97,7 +100,7 @@ describe MagLev::ActiveModel::WhenChange, 'with Mongoid after_* callbacks' do
     example.save!
     example.name = 's'
     example.save!
-    expect(example.reload.active).to eq true
     expect(example.results).to include(:active_set)
+    expect(WhenChangeMongoidExample.find(example.id).active).to eq true
   end
 end

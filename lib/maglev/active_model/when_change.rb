@@ -98,9 +98,17 @@ module MagLev
           to_values = @to_values
           field = @field
           running = @running
+          after_callback = callback.to_s.start_with?('after_')
 
           @klass.send(callback) do
-            from = self.send("#{field}_was")
+            # Mongoid 8 makes `attribute_was` return the new value inside after_*
+            # callbacks, so read the pre-save value from the last save instead.
+            from =
+              if after_callback && respond_to?(:attribute_before_last_save)
+                attribute_before_last_save(field)
+              else
+                self.send("#{field}_was")
+              end
             to = self.send(field)
 
             # collect a hash to identify the uniqueness of this callback
