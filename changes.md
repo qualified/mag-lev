@@ -1,3 +1,8 @@
+# 0.10.0
+- Lifted the `redis < 5` and `globalid <= 1.0` caps (specs pass on redis 5.4 / globalid 1.4). `MagLev.redis` no longer uses the removed `Redis.current`: without Sidekiq it uses a memoized `Redis.new(url: ENV['REDIS_URL'])`, replaceable via `MagLev.redis_client=`. Reliable jobs now store the timestamp as a String (redis 5 rejects Time values).
+- `enhanced_serialize` uses `YAML.unsafe_load` when available, fixing deserialization on Ruby 3.1+ (Psych 4).
+- Verified on Rails 6.1 and 7.0 (ActiveJob deserialize patch, enhanced_serialize and SidekiqAdapter unchanged). Remaining Rails 7.0 failures: `when_change` `errors[field] <<` specs (frozen errors), tracked separately.
+- Qualified work: bump the Gemfile from `tag: 'v0.9.0'` to `v0.10.0`; Qualified may now resolve redis 5 / globalid 1.x, so check its own Redis usage (`Redis.current`, Time values, `Sidekiq` version) before allowing redis 5.
 # 0.9.0
 - `when_change` after_save/after_update/after_create callbacks read the "from" value captured in before_save, since `attribute_was` returns the new value inside after callbacks on Mongoid 8. A save made from inside a callback block no longer hides the original value from later callbacks. Release together with the Qualified Mongoid 8.1 bump.
 # 0.8.3
