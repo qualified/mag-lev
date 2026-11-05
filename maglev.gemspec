@@ -26,9 +26,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'globalid', '<= 1.0'
+  spec.add_dependency 'globalid'
   spec.add_dependency 'activemodel', '>= 6.0.0'
-  spec.add_dependency 'redis', '< 5.0.0'
+  spec.add_dependency 'redis'
   spec.add_dependency 'activejob', '>= 6.0.0'
   spec.add_dependency 'request_store'
   spec.add_dependency 'activesupport', '>= 6.0.0'

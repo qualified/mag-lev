@@ -57,7 +57,7 @@ module MagLev
       def rely!(&block)
         begin
           MagLev.redis do |conn|
-            conn.hset(Reliable.key, rely_key, Time.now)
+            conn.hset(Reliable.key, rely_key, Time.now.to_s) # redis 5 rejects non-String values
           end
           @rely = true
         rescue => ex
