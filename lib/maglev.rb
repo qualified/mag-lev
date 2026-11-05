@@ -119,14 +119,20 @@ module MagLev
     end
 
     # passes a redis instance into the block provided. If Sidekiq is loaded then this will
-    # draw from its connection pool, otherwise Redis.current will be passed in.
+    # draw from its connection pool, otherwise a memoized Redis client (see #redis_client=) is used.
     def redis(&block)
       if defined?(::Sidekiq) && ::Sidekiq.respond_to?(:redis)
         ::Sidekiq.redis(&block)
       else
         # TODO: utilize config and our own connection pool
-        block.call(Redis.current)
+        block.call(redis_client)
       end
+    end
+
+    attr_writer :redis_client
+
+    def redis_client
+      @redis_client ||= ::Redis.new(url: ENV['REDIS_URL'])
     end
   end
 end

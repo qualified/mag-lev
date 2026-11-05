@@ -17,10 +17,8 @@ jobs:
     runs-on: ubuntu-24.04 # ubuntu-latest is 26.04, which has no prebuilt Ruby 3.0/3.1
     # Rails 7.0 still fails the when_change `errors[field] <<` specs (Rails 7
     # frozen errors; separate from QUAL-2684, which fixed Mongoid 8 dirty
-    # tracking). Ruby 3.1 fails
-    # on YAML.load (Psych 4) in enhanced_serialize.rb until QUAL-2629 lands.
-    # Remove each condition when its ticket is done.
-    continue-on-error: ${{ matrix.rails == '7.0' || matrix.ruby == '3.1' }}
+    # tracking). Remove this condition when that is fixed.
+    continue-on-error: ${{ matrix.rails == '7.0' }}
     strategy:
       fail-fast: false
       matrix:

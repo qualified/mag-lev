@@ -174,7 +174,7 @@ module MagLev
                   when 'gid'
                     ::GlobalID::Locator.locate(argument['value'])
                   when 'yaml'
-                    YAML.load(argument['value'])
+                    YAML.respond_to?(:unsafe_load) ? YAML.unsafe_load(argument['value']) : YAML.load(argument['value'])
                   when 'destroyed'
                     deserialize_destroyed(argument)
                   else
