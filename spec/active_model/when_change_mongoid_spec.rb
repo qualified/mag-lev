@@ -1,8 +1,9 @@
 require 'spec_helper'
 require 'mongoid'
 
-# requiring mongoid defines Rails, and MagLev.logger then picks up a nil Rails.logger
-Rails.logger ||= Logger.new(IO::NULL) if Rails.respond_to?(:logger=)
+# Rails may be defined here (globalid <= 1.0 and the mongoid railtie define it), and MagLev.logger
+# then picks up a nil Rails.logger. It is not defined with newer globalid, so guard for that.
+Rails.logger ||= Logger.new(IO::NULL) if defined?(Rails) && Rails.respond_to?(:logger=)
 
 Mongoid.load_configuration(
   clients: {
