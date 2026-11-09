@@ -73,10 +73,10 @@ module MagLev
             if block
               msg = instance_exec(from, to, &block)
               if msg
-                self.errors[field] << msg
+                errors.add(field, msg)
               end
             else
-              self.errors[field] << msg || 'is an invalid'
+              errors.add(field, msg || 'is an invalid')
             end
           end
         end
