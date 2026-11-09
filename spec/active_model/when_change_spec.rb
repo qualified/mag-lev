@@ -20,6 +20,7 @@ class WhenChangeExample < Model
     .from('b', 'e')
       .to('c', 'd').invalidate('not allowed')
       .to_any.invalidate { 'not allowed when active' if active }
+      .to('g').invalidate
     .from('protected').to_any.protect { raise 'not allowed!' }
 
   when_change(:active)
@@ -82,6 +83,12 @@ describe MagLev::ActiveModel::WhenChange do
       example.active = true
       example.valid?
       expect(example.errors[:name].first).to eq 'not allowed when active'
+    end
+
+    it 'should use a default message when none is given' do
+      example.name = 'g'
+      example.valid?
+      expect(example.errors[:name]).to eq ['is an invalid']
     end
   end
 

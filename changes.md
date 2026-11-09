@@ -1,3 +1,6 @@
+# 0.10.1
+- `when_change` `invalidate` adds its message with `errors.add`, fixing the frozen `errors[field]` error on Rails 7.0. Without a message it now uses the default `'is an invalid'` (it previously appended nil). The Rails 7.0 CI cells are no longer `continue-on-error`.
+- Qualified work: bump the Gemfile from `tag: 'v0.10.0'` to `v0.10.1` and regenerate `Gemfile.lock` and `Gemfile.next.lock`.
 # 0.10.0
 - Lifted the `redis < 5` and `globalid <= 1.0` caps (specs pass on redis 5.4 / globalid 1.4). `MagLev.redis` no longer uses the removed `Redis.current`: without Sidekiq it uses a memoized `Redis.new(url: ENV['REDIS_URL'])`, replaceable via `MagLev.redis_client=`. Reliable jobs now store the timestamp as a String (redis 5 rejects Time values).
 - `enhanced_serialize` uses `YAML.unsafe_load` when available, fixing deserialization on Ruby 3.1+ (Psych 4).
